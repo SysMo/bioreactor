@@ -12,17 +12,17 @@
   - algorithm
     - trigger with hysteresis
 
-### Motor
-  - pwm modulation
-  - motor driver (XY-MOS or XY-GMOS)
+### Stirrer
+  - motor control with pwm modulation
+    - motor driver (XY-MOS or XY-GMOS)
   - reading tacho using ADS1115
-  - Pollarity-independent readout:
+  - P controller
+  - pollarity-independent readout:
     - https://electronics.stackexchange.com/questions/217835/understanding-absolute-value-circuit-operation
 
 ### MCU Networking
   - connect to wireless
   - mqqt messaging
-  - publish to EMQX cloud:
 
 ## Message Broker
   - broker
@@ -36,21 +36,16 @@
     - sysmo/esp32/bio1/to
 
 ## Database
-
-
-## Server
-
+  - time series database
+  - InfluxDB using Telegraf
 
 ## Front-end
   - requirements
     - connect to mqtt
     - show current values (temperature, heater state, motor speed)
     - modify parameters (target temperature, motor target speed, on/off time)
-  
-  
-  - widget libraries
-    - canvas-gauges
-      - https://canvas-gauges.com/documentation/examples/
-      - https://github.com/Mikhus/canvas-gauges
-    - sliders
-      - 
+    - show alerts
+    
+  - implementation
+    - cross-platform development using flutter & dart
+    - desktop, web, android
