@@ -1,11 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
 // import 'dart:io';
+import 'log.dart';
 import 'package:mqtt_client/mqtt_client.dart' as mqtt;
 import 'package:mqtt_client/mqtt_server_client.dart';
 import 'messages.dart';
 
-class MqttService {
+class MqttService with Logging {
   final String url;
   final String username;
   final String password;
@@ -31,13 +32,13 @@ class MqttService {
         .startClean() // Non persistent session for testing
         .withWillQos(mqtt.MqttQos.atMostOnce);
 
-    print('[MQTT client] MQTT client connecting....');
+    logger.i('[MQTT client] MQTT client connecting....');
     client.connectionMessage = connMess;
 
     try {
       await client.connect(username, password);
     } catch (e) {
-      print(e);
+      logger.e(e);
       _disconnect();
     }
 
@@ -45,12 +46,12 @@ class MqttService {
 
     /// Check if we are connected
     if (connectionState == mqtt.MqttConnectionState.connected) {
-      print('[MQTT client] connected');
+      logger.i('[MQTT client] connected');
       // setState(() {
       //   connectionState = client.connectionState;
       // });
     } else {
-      print('[MQTT client] ERROR: MQTT client connection failed - '
+      logger.e('[MQTT client] ERROR: MQTT client connection failed - '
           'disconnecting, state is $connectionState');
       _disconnect();
     }
@@ -61,13 +62,11 @@ class MqttService {
   }
 
   void _disconnect() {
-    print('[MQTT client] _disconnect()');
     client.disconnect();
     _onDisconnected();
   }
 
   void _onDisconnected() {
-    print('[MQTT client] _onDisconnected');
     // setState(() {
     //   //topics.clear();
     //   connectionState = client.connectionState;
@@ -75,7 +74,7 @@ class MqttService {
     //   subscription.cancel();
     //   subscription = null;
     // });
-    print('[MQTT client] MQTT client disconnected');
+    logger.i('[MQTT client] MQTT client disconnected');
   }
 
   bool isConnected() {
@@ -89,11 +88,9 @@ class MqttService {
         mqtt.MqttPublishPayload.bytesToStringAsString(recMess.payload.message);
     final String topic = event[0].topic;
 
-    print("Received: [$topic] $message");
+    logger.i("Received: [$topic] $message");
     var json = jsonDecoder.convert(message);
     var mv = MeasurementValue.fromJson(json);
-    print(json);
-    print(mv);
   }
 
   mqtt.Subscription? _subscribeToTopic(String topic) {

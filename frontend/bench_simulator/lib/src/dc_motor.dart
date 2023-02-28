@@ -1,9 +1,10 @@
 import 'dart:async';
 
 import 'package:bench_communication/channels.dart';
+import 'package:bench_communication/log.dart';
 import 'sampler.dart';
 
-class DCServoMotor {
+class DCServoMotor with Logging {
   double omega = 0.0;
   double omegaTarget = 0.0;
   double dutyCycle = 0.0;
@@ -39,10 +40,9 @@ class DCServoMotor {
       omegaTarget = command.value;
     } else if (command is ReadTarget &&
         omegaTargetChannelController.hasListener) {
-      print("Reading target omega");
       omegaTargetChannelController.add(omegaTarget);
     } else {
-      print("Unknown command");
+      logger.w("Unknown command: $command");
     }
   }
 

@@ -1,8 +1,10 @@
 import 'dart:async';
 
+import 'log.dart';
+
 class ControlAction {}
 
-class ControlChannel<T, U extends ControlAction> {
+class ControlChannel<T, U extends ControlAction> with Logging {
   Stream<T> values;
   late StreamController<U> actionController;
   bool actionsPaused = false;
@@ -30,8 +32,6 @@ class ControlChannel<T, U extends ControlAction> {
   }
 
   bool dispatch(U event) {
-    print(
-        "${runtimeType.toString()} / $actionsHasSubscription / $actionsPaused");
     if (actionsHasSubscription && !actionsPaused) {
       actionController.add(event);
       return true;

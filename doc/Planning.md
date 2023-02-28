@@ -31,8 +31,14 @@
   - tasks
     - [ ] code for temperature reading
     - [ ] code for temperature control
-    - [ ] code for 
-    - [ ] wreless router?
+    - [x] code for pwm output
+    - [ ] code for speed readout
+    - [ ] code for PID controller
+    - [x] power supply
+    - [ ] assemble controller board
+    - [ ] assemble sensor board
+    - [ ] assemble actuator board? (if different)
+    - [ ] wireless router?
   
 
 

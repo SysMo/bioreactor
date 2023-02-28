@@ -1,9 +1,10 @@
 import "dart:async";
 
 import 'package:bench_communication/channels.dart';
+import 'package:bench_communication/log.dart';
 import 'sampler.dart';
 
-class ThermalMassSystem {
+class ThermalMassSystem with Logging {
   double temperature;
   double targetTemperature;
   double temperatureTolerance = 1.0;
@@ -52,15 +53,14 @@ class ThermalMassSystem {
       targetTemperature = command.value;
     } else if (command is ReadTarget &&
         temperatureTargetChannelController.hasListener) {
-      print("Reading target temperature");
       temperatureTargetChannelController.add(targetTemperature);
     } else {
-      print("Unknown command");
+      logger.w("Unknown command $command");
     }
   }
 
   void onHeaterCommand(OnOffAction command) {
-    print("Got heater command: $command");
+    // print("Got heater command: $command");
   }
 
   // @override
@@ -71,11 +71,11 @@ class ThermalMassSystem {
       if ((temperature < targetTemperature - temperatureTolerance) &&
           !heaterOn) {
         heaterOn = true;
-        print("Turning heater on");
+        logger.i("Turning heater on");
       } else if ((temperature > targetTemperature + temperatureTolerance) &&
           heaterOn) {
         heaterOn = false;
-        print("Turning heater off");
+        logger.i("Turning heater off");
       }
       double qDot = (heaterOn ? heaterPower : 0.0) -
           heatLossConv * (temperature - ambientTemperature);
