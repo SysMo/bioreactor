@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:bench_communication/channels.dart';
+import 'package:bench_core/channels.dart';
 import 'package:sprintf/sprintf.dart';
 
 class FloatValueReadout extends StatefulWidget {

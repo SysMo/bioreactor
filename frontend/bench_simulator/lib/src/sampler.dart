@@ -1,4 +1,4 @@
-import 'package:bench_communication/channels.dart';
+import 'package:bench_core/channels.dart';
 
 class Sampler {
   static Stream<T> periodicStream<T>(T Function(double) f) {

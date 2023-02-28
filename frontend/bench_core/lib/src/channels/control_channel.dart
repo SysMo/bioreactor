@@ -1,16 +1,17 @@
 import 'dart:async';
 
-import 'log.dart';
+import 'package:bench_core/src/log.dart';
+import 'measurement_channel.dart';
 
 class ControlAction {}
 
 class ControlChannel<T, U extends ControlAction> with Logging {
-  Stream<T> values;
+  MeasurementChannel<T> measurementChannel;
   late StreamController<U> actionController;
   bool actionsPaused = false;
   bool actionsHasSubscription = false;
 
-  ControlChannel(this.values) {
+  ControlChannel(this.measurementChannel) {
     actionController = StreamController<U>(
       onListen: () {
         actionsHasSubscription = true;

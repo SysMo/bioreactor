@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:bench_communication/channels.dart';
+import 'package:bench_core/channels.dart';
 import 'led_indicator.dart';
 
 class OnOffValueControl extends StatefulWidget {
@@ -41,7 +41,7 @@ class _OnOffValueControlState extends State<OnOffValueControl> {
             textScaleFactor: 1.5,
           ),
           StreamBuilder(
-            stream: widget.channel.values,
+            stream: widget.channel.measurementChannel.values,
             builder: (BuildContext context, AsyncSnapshot snapshot) {
               bool isOn = snapshot.data ?? false;
               return LedBulbIndicator(

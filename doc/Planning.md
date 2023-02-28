@@ -81,6 +81,8 @@
     - cross-platform development using flutter & dart
     - desktop, web, android
 
+  See [Frontend](Frontend.md)
+
   - questiones:
     - how many different views should we have?
     - historical data view 

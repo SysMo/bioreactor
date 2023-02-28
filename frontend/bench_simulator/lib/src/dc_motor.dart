@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:bench_communication/channels.dart';
-import 'package:bench_communication/log.dart';
+import 'package:bench_core/channels.dart';
+import 'package:bench_core/log.dart';
 import 'sampler.dart';
 
 class DCServoMotor with Logging {
@@ -27,7 +27,8 @@ class DCServoMotor with Logging {
         advanceTime(t);
         return omega;
       }),
-      setpointChannel: ControlChannel(omegaTargetChannelController.stream),
+      setpointChannel: ControlChannel(
+          MeasurementChannel(omegaTargetChannelController.stream)),
     );
 
     speedChannel.setpointChannel.controlStream().listen(onSpeedCommand);

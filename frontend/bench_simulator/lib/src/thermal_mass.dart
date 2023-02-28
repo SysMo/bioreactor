@@ -1,7 +1,7 @@
 import "dart:async";
 
-import 'package:bench_communication/channels.dart';
-import 'package:bench_communication/log.dart';
+import 'package:bench_core/channels.dart';
+import 'package:bench_core/log.dart';
 import 'sampler.dart';
 
 class ThermalMassSystem with Logging {
@@ -37,14 +37,14 @@ class ThermalMassSystem with Logging {
           advanceTime(t);
           return temperature;
         })),
-        setpointChannel:
-            ControlChannel(temperatureTargetChannelController.stream));
+        setpointChannel: ControlChannel(
+            MeasurementChannel(temperatureTargetChannelController.stream)));
     temperatureChannel.setpointChannel
         .controlStream()
         .listen(onTemperatureCommand);
 
-    heaterChannel =
-        OnOffControlChannel(Sampler.periodicStream((t) => heaterOn));
+    heaterChannel = OnOffControlChannel(
+        MeasurementChannel(Sampler.periodicStream((t) => heaterOn)));
     heaterChannel.controlStream().listen(onHeaterCommand);
   }
 

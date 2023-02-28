@@ -1,5 +1,5 @@
-name: bench_communication
-description: Communication of the frontend with the bench and various services.
+name: bench_core
+description: Core library for the frontend taking care of communications and various utils
 version: 1.0.0
 # repository: https://github.com/my_org/my_repo
 
@@ -11,6 +11,7 @@ dependencies:
   freezed_annotation: ^2.2.0
   json_annotation: ^4.8.0
   mqtt_client: ^9.7.4
+  sprintf: "^7.0.0"
 
 dev_dependencies:
   lints: ^2.0.0

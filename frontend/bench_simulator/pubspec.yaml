@@ -11,8 +11,8 @@ environment:
 dependencies:
   logger: ^1.2.2
   path: ^1.8.0
-  bench_communication:
-    path: ../bench_communication
+  bench_core:
+    path: ../bench_core
 
 dev_dependencies:
   lints: ^2.0.0

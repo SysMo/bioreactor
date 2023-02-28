@@ -1,4 +1,4 @@
-import 'package:bench_communication/mqtt.dart';
+import 'package:bench_core/mqtt.dart';
 
 class Services {
   MqttService? mqtt;

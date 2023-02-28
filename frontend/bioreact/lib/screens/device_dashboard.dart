@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:bench_simulator/bench_simulator.dart';
+import 'package:bench_core/channels.dart';
 import 'package:bench_dashboard/basic.dart';
+import 'package:bench_dashboard/composite.dart';
+import 'package:bench_dashboard/layouts.dart';
 import '../services.dart';
 
 class DeviceDashboard extends StatefulWidget {
@@ -21,27 +24,36 @@ class _DeviceDashboardState extends State<DeviceDashboard> {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    var timeUpChannel = thermalMassSystem.timeUpChannel
+      ..formatter = FixedNumberFormatter(precision: 0)
+      ..label = "Uptime"
+      ..unit = "s";
+    var dutyCycleChannel = motor.dutyCycleChannel
+      ..formatter = PercentFormatter(precision: 0)
+      ..label = "PWM duty cycle"
+      ..unit = "%";
+    return DashboardLayout(
       children: [
-        FloatValueReadout(
-            title: "Uptime [s]",
-            measurementChannel: thermalMassSystem.timeUpChannel),
+        StatusOverwiew(
+            channels: [timeUpChannel, dutyCycleChannel]), // FloatValueReadout(
+        //     title: "Uptime [s]",
+        //     measurementChannel: thermalMassSystem.timeUpChannel),
         SetpointValueControl(
           title: "Temperature [C]",
           channel: thermalMassSystem.temperatureChannel,
           minimum: 30,
           maximum: 40,
         ),
-        OnOffValueControl(
-            title: "Heater", channel: thermalMassSystem.heaterChannel),
+        // OnOffValueControl(
+        //     title: "Heater", channel: thermalMassSystem.heaterChannel),
         SetpointValueControl(
           title: "Motor speed [RPM]",
           channel: motor.speedChannel,
           minimum: 0,
           maximum: 2000,
         ),
-        FloatValueReadout(
-            title: "PWM duty []", measurementChannel: motor.dutyCycleChannel),
+        // FloatValueReadout(
+        //     title: "PWM duty []", measurementChannel: motor.dutyCycleChannel),
       ],
     );
 

@@ -36,8 +36,8 @@ dependencies:
   # json_annotation: ^4.8.0
   # mqtt_client: ^9.7.4
   logger: ^1.2.2
-  bench_communication:
-    path: ../bench_communication
+  bench_core:
+    path: ../bench_core
   bench_simulator:
     path: ../bench_simulator
   bench_dashboard:

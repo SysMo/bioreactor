@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
-import 'package:bench_communication/channels.dart';
+import 'package:bench_core/channels.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 
 class SetpointValueControl extends StatefulWidget {
@@ -22,32 +22,45 @@ class SetpointValueControl extends StatefulWidget {
 
 class _SetpointValueControlState extends State<SetpointValueControl> {
   double? measuredValue;
-  double? targetValue;
-  late StreamController<SetpointAction> setpointController;
+  double? setpointValue;
+
+  late StreamSubscription measurementSubscription;
+  late StreamSubscription setpointSubscription;
 
   @override
   void initState() {
     super.initState();
 
-    widget.channel.measurementChannel.values.listen((event) {
+    var spChannel = widget.channel;
+
+    measurementSubscription =
+        spChannel.measurementChannel.values.listen((event) {
       setState(() {
         measuredValue = event;
       });
     });
 
-    widget.channel.setpointChannel.values.listen((event) {
+    setpointSubscription =
+        spChannel.setpointChannel.measurementChannel.values.listen((event) {
       setState(() {
-        targetValue = event;
+        setpointValue = event;
       });
     });
 
     widget.channel.setpointChannel.dispatch(ReadTarget());
   }
 
+  @override
+  void dispose() {
+    measurementSubscription.cancel();
+    setpointSubscription.cancel();
+    super.dispose();
+  }
+
   void onvalueChanged(double value) {
     widget.channel.setpointChannel.dispatch(SetTarget(value));
     setState(() {
-      targetValue = value;
+      setpointValue = value;
     });
   }
 
@@ -70,7 +83,7 @@ class _SetpointValueControlState extends State<SetpointValueControl> {
               maximum: widget.maximum,
               pointers: <GaugePointer>[
                 MarkerPointer(
-                  value: targetValue ?? 0,
+                  value: setpointValue ?? 0,
                   enableDragging: true,
                   onValueChanged: onvalueChanged,
                   onValueChangeEnd: onTargetChangeEnd,
