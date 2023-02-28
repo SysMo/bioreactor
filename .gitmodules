@@ -1,0 +1,12 @@
+[submodule "circuits/component_libraries/espressif"]
+	path = circuits/component_libraries/espressif
+	url = https://github.com/espressif/kicad-libraries.git
+[submodule "circuits/component_libraries/digikey"]
+	path = circuits/component_libraries/digikey
+	url = https://github.com/Digi-Key/digikey-kicad-library
+[submodule "circuits/component_libraries/digikey_partners"]
+	path = circuits/component_libraries/digikey_partners
+	url = https://github.com/Digi-Key/digikey-partner-kicad-library.git
+[submodule "circuits/component_libraries/ESP32_DevKit_V1"]
+	path = circuits/component_libraries/ESP32_DevKit_V1
+	url = https://gitlab.com/VictorLamoine/kicad.git

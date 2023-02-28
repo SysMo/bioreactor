@@ -1,0 +1,5 @@
+(sym_lib_table
+  (lib (name "ESP32_Devkit_1")(type "Legacy")(uri "/data/Workspace/BAN/10_bioreactor_controller/circuits/component_libraries/ESP32_DevKit_V1/symbols/esp32_devkit_v1_doit.lib")(options "")(descr ""))
+  (lib (name "1085")(type "KiCad")(uri "/data/Workspace/BAN/10_bioreactor_controller/circuits/component_libraries/ads1x1x/1085.kicad_sym")(options "")(descr ""))
+  (lib (name "SysMo")(type "KiCad")(uri "/data/Workspace/BAN/10_bioreactor_controller/circuits/component_libraries/sysmo/SysMo.kicad_sym")(options "")(descr ""))
+)
