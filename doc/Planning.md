@@ -16,6 +16,8 @@
   - pwm modulation
   - motor driver (XY-MOS or XY-GMOS)
   - reading tacho using ADS1115
+  - Pollarity-independent readout:
+    - https://electronics.stackexchange.com/questions/217835/understanding-absolute-value-circuit-operation
 
 ### MCU Networking
   - connect to wireless
