@@ -36,8 +36,13 @@
     - sysmo/esp32/bio1/to
 
 ## Database
-  - time series database
-  - InfluxDB using Telegraf
+  - requirements:  
+    - time series database
+    - save all sensor data
+    - save parameter settings
+
+  - implementation:
+    - InfluxDB using Telegraf
 
 ## Front-end
   - requirements
