@@ -17,23 +17,23 @@ class DCServoMotor with Logging {
   double tEps = 1e-3;
 
   late SetpointValueChannel speedChannel;
-  late MeasurementChannel<double> dutyCycleChannel;
+  late TypedMeasurementChannel<double> dutyCycleChannel;
   StreamController<double> omegaTargetChannelController =
       StreamController<double>();
 
   DCServoMotor() {
     speedChannel = SetpointValueChannel(
-      measurementChannel: Sampler.periodicMeasurement((t) {
+      measurementChannel: Sampler.typed((t) {
         advanceTime(t);
         return omega;
       }),
       setpointChannel: ControlChannel(
-          MeasurementChannel(omegaTargetChannelController.stream)),
+          TypedMeasurementChannel(omegaTargetChannelController.stream)),
     );
 
     speedChannel.setpointChannel.controlStream().listen(onSpeedCommand);
 
-    dutyCycleChannel = Sampler.periodicMeasurement((t) => dutyCycle);
+    dutyCycleChannel = Sampler.typed((t) => dutyCycle);
   }
 
   void onSpeedCommand(SetpointAction command) {

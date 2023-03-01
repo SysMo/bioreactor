@@ -4,7 +4,7 @@ import 'package:sprintf/sprintf.dart';
 
 class FloatValueReadout extends StatefulWidget {
   final String title;
-  final MeasurementChannel<double> measurementChannel;
+  final TypedMeasurementChannel<double> measurementChannel;
 
   const FloatValueReadout({
     super.key,
@@ -21,11 +21,12 @@ class _FloatValueReadoutState extends State<FloatValueReadout> {
   Widget build(BuildContext context) {
     return Column(children: [
       Text(widget.title, textScaleFactor: 1.5),
-      StreamBuilder<double>(
+      StreamBuilder<double?>(
           stream: widget.measurementChannel.values,
-          builder: (BuildContext context, AsyncSnapshot<double> snapshot) {
-            var formatted =
-                snapshot.hasData ? sprintf("%2.2f", [snapshot.data]) : "N/A";
+          builder: (BuildContext context, AsyncSnapshot<double?> snapshot) {
+            var formatted = (snapshot.hasData && snapshot.data != null)
+                ? sprintf("%2.2f", [snapshot.data])
+                : "N/A";
 
             return Center(
                 child: Text(

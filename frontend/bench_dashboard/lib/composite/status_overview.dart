@@ -1,20 +1,21 @@
 import 'dart:async';
 
 import 'package:bench_core/channels.dart';
+import 'package:bench_core/messages.dart';
 import 'package:flutter/material.dart';
 import 'package:collection/collection.dart';
 
 mixin HasSubscriptions {
-  List<StreamSubscription> subscriptions = [];
-  List<double> values = [];
+  List<StreamSubscription<Value>> subscriptions = [];
+  List<Value> values = [];
 
   void Function(void Function())? onSubscriptionValue;
 
   void subscribe(
-    Stream<double> stream,
+    Stream<Value> stream,
   ) {
     int i = subscriptions.length;
-    values.add(0.0);
+    values.add(const Value.none());
     subscriptions.add(stream.listen((value) {
       if (onSubscriptionValue != null) {
         onSubscriptionValue!(() {
@@ -32,7 +33,7 @@ mixin HasSubscriptions {
 }
 
 class StatusOverwiew extends StatefulWidget {
-  final List<MeasurementChannel<double>> channels;
+  final List<MeasurementChannel> channels;
   const StatusOverwiew({super.key, required this.channels});
 
   @override
@@ -72,7 +73,7 @@ class _StatusOverwiewState extends State<StatusOverwiew> with HasSubscriptions {
     );
   }
 
-  TableRow buildRow(int index, double value) {
+  TableRow buildRow(int index, Value value) {
     String valueText =
         widget.channels[index].formatter?.format(value) ?? value.toString();
     String description = widget.channels[index].label ?? "Value";

@@ -6,7 +6,7 @@ import 'measurement_channel.dart';
 class ControlAction {}
 
 class ControlChannel<T, U extends ControlAction> with Logging {
-  MeasurementChannel<T> measurementChannel;
+  TypedMeasurementChannel<T> measurementChannel;
   late StreamController<U> actionController;
   bool actionsPaused = false;
   bool actionsHasSubscription = false;

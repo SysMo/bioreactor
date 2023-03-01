@@ -15,7 +15,7 @@ abstract class SetpointValueChannelSource {
 }
 
 class SetpointValueChannel {
-  MeasurementChannel<double> measurementChannel;
+  TypedMeasurementChannel<double> measurementChannel;
   ControlChannel<double, SetpointAction> setpointChannel;
 
   SetpointValueChannel({

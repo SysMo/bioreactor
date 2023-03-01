@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'log.dart';
 import 'package:mqtt_client/mqtt_client.dart' as mqtt;
 import 'package:mqtt_client/mqtt_server_client.dart';
-import 'messages.dart';
+import 'messages/messages.dart';
 
 class MqttService with Logging {
   final String url;

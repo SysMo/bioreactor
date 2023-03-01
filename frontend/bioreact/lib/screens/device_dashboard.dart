@@ -24,18 +24,44 @@ class _DeviceDashboardState extends State<DeviceDashboard> {
 
   @override
   Widget build(BuildContext context) {
-    var timeUpChannel = thermalMassSystem.timeUpChannel
-      ..formatter = FixedNumberFormatter(precision: 0)
-      ..label = "Uptime"
-      ..unit = "s";
-    var dutyCycleChannel = motor.dutyCycleChannel
-      ..formatter = PercentFormatter(precision: 0)
-      ..label = "PWM duty cycle"
-      ..unit = "%";
+    var temperatureMeasurementChannel =
+        thermalMassSystem.temperatureChannel.measurementChannel.withProps(
+      label: "Temperature",
+      formatter: FixedNumberFormatter(precision: 1),
+      unit: "C",
+    );
+
+    var timeUpChannel = thermalMassSystem.timeUpChannel.withProps(
+      label: "Uptime",
+      formatter: FixedNumberFormatter(precision: 0),
+      unit: "s",
+    );
+
+    var heaterOnChannel = thermalMassSystem.heaterChannel.measurementChannel
+        .withProps(label: "Heater", formatter: BooleanFormatter());
+
+    var stirrerSpeedMeasurementChannel =
+        motor.speedChannel.measurementChannel.withProps(
+      label: "Stirrer speed",
+      formatter: FixedNumberFormatter(precision: 0),
+      unit: "rpm",
+    );
+
+    var dutyCycleChannel = motor.dutyCycleChannel.withProps(
+      label: "PWM duty cycle",
+      formatter: PercentFormatter(precision: 0),
+      unit: "%",
+    );
+
     return DashboardLayout(
       children: [
-        StatusOverwiew(
-            channels: [timeUpChannel, dutyCycleChannel]), // FloatValueReadout(
+        StatusOverwiew(channels: [
+          timeUpChannel.asUntyped(),
+          temperatureMeasurementChannel.asUntyped(),
+          heaterOnChannel.asUntyped(),
+          stirrerSpeedMeasurementChannel.asUntyped(),
+          dutyCycleChannel.asUntyped(),
+        ]), // FloatValueReadout(
         //     title: "Uptime [s]",
         //     measurementChannel: thermalMassSystem.timeUpChannel),
         SetpointValueControl(
