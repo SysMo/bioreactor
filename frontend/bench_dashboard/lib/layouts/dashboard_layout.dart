@@ -14,16 +14,21 @@ class DashboardLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Wrap(
-      spacing: 8.0,
-      runSpacing: 4.0,
-      children: children
-          .map((child) => SizedBox(
-                width: tileWidth,
-                height: tileHegiht,
-                child: Center(child: child),
-              ))
-          .toList(),
-    );
+    return LayoutBuilder(builder: (context, constraints) {
+      return SizedBox(
+          height: constraints.maxHeight,
+          child: SingleChildScrollView(
+              child: Wrap(
+            spacing: 8.0,
+            runSpacing: 4.0,
+            children: children
+                .map((child) => SizedBox(
+                      width: tileWidth,
+                      height: tileHegiht,
+                      child: Center(child: child),
+                    ))
+                .toList(),
+          )));
+    });
   }
 }
