@@ -16,7 +16,8 @@ class MqttService with Logging {
 
   MqttServerClient client;
   mqtt.MqttConnectionState? connectionState;
-  StreamSubscription? subscription;
+  StreamSubscription? mainSubscription;
+  Map<String, StreamController<String>> topicControllers = {};
 
   Future<void> connect() async {
     // client.port = port;
@@ -42,23 +43,15 @@ class MqttService with Logging {
       _disconnect();
     }
 
-    var connectionState = client.connectionStatus?.state;
-
     /// Check if we are connected
-    if (connectionState == mqtt.MqttConnectionState.connected) {
+    if (isConnected()) {
       logger.i('[MQTT client] connected');
-      // setState(() {
-      //   connectionState = client.connectionState;
-      // });
+      mainSubscription = client.updates?.listen(_onMessage);
     } else {
       logger.e('[MQTT client] ERROR: MQTT client connection failed - '
           'disconnecting, state is $connectionState');
       _disconnect();
     }
-
-    subscription = client.updates?.listen(_onMessage);
-
-    _subscribeToTopic("sysmo/esp32/bio1/#");
   }
 
   void _disconnect() {
@@ -67,13 +60,6 @@ class MqttService with Logging {
   }
 
   void _onDisconnected() {
-    // setState(() {
-    //   //topics.clear();
-    //   connectionState = client.connectionState;
-    //   client = null;
-    //   subscription.cancel();
-    //   subscription = null;
-    // });
     logger.i('[MQTT client] MQTT client disconnected');
   }
 
@@ -89,12 +75,23 @@ class MqttService with Logging {
     final String topic = event[0].topic;
 
     logger.i("Received: [$topic] $message");
-    var json = jsonDecoder.convert(message);
-    var mv = MeasurementValue.fromJson(json);
+    StreamController? controller = topicControllers[topic];
+    if (controller != null) {
+      controller.add(message);
+    }
   }
 
-  mqtt.Subscription? _subscribeToTopic(String topic) {
-    return client.subscribe(topic, mqtt.MqttQos.atMostOnce);
+  void publish(String topic, String message) {
+    final builder = mqtt.MqttClientPayloadBuilder();
+    builder.addString(message);
+    client.publishMessage(topic, mqtt.MqttQos.atMostOnce, builder.payload!);
+  }
+
+  Stream<String> subscribeToTopic(String topic) {
+    var controller = StreamController<String>();
+    topicControllers[topic] = controller;
+    client.subscribe(topic, mqtt.MqttQos.atMostOnce);
+    return controller.stream;
     //  if (connectionStatus!.state != MqttConnectionState.connected) {
 
     // print('[MQTT client] $connectionState');

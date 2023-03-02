@@ -14,6 +14,21 @@ T _$identity<T>(T value) => value;
 final _privateConstructorUsedError = UnsupportedError(
     'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
 
+Value _$ValueFromJson(Map<String, dynamic> json) {
+  switch (json['runtimeType']) {
+    case 'none':
+      return None.fromJson(json);
+    case 'real':
+      return Real.fromJson(json);
+    case 'boolean':
+      return Bool.fromJson(json);
+
+    default:
+      throw CheckedFromJsonException(json, 'runtimeType', 'Value',
+          'Invalid union type "${json['runtimeType']}"!');
+  }
+}
+
 /// @nodoc
 mixin _$Value {
   @optionalTypeArgs
@@ -60,6 +75,7 @@ mixin _$Value {
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
 }
 
 /// @nodoc
@@ -93,9 +109,14 @@ class __$$NoneCopyWithImpl<$Res> extends _$ValueCopyWithImpl<$Res, _$None>
 }
 
 /// @nodoc
-
+@JsonSerializable()
 class _$None implements None {
-  const _$None();
+  const _$None({final String? $type}) : $type = $type ?? 'none';
+
+  factory _$None.fromJson(Map<String, dynamic> json) => _$$NoneFromJson(json);
+
+  @JsonKey(name: 'runtimeType')
+  final String $type;
 
   @override
   String toString() {
@@ -108,6 +129,7 @@ class _$None implements None {
         (other.runtimeType == runtimeType && other is _$None);
   }
 
+  @JsonKey(ignore: true)
   @override
   int get hashCode => runtimeType.hashCode;
 
@@ -178,10 +200,19 @@ class _$None implements None {
     }
     return orElse();
   }
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$NoneToJson(
+      this,
+    );
+  }
 }
 
 abstract class None implements Value {
   const factory None() = _$None;
+
+  factory None.fromJson(Map<String, dynamic> json) = _$None.fromJson;
 }
 
 /// @nodoc
@@ -213,12 +244,17 @@ class __$$RealCopyWithImpl<$Res> extends _$ValueCopyWithImpl<$Res, _$Real>
 }
 
 /// @nodoc
-
+@JsonSerializable()
 class _$Real implements Real {
-  const _$Real(this.v);
+  const _$Real(this.v, {final String? $type}) : $type = $type ?? 'real';
+
+  factory _$Real.fromJson(Map<String, dynamic> json) => _$$RealFromJson(json);
 
   @override
   final double v;
+
+  @JsonKey(name: 'runtimeType')
+  final String $type;
 
   @override
   String toString() {
@@ -233,6 +269,7 @@ class _$Real implements Real {
             (identical(other.v, v) || other.v == v));
   }
 
+  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(runtimeType, v);
 
@@ -309,10 +346,19 @@ class _$Real implements Real {
     }
     return orElse();
   }
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$RealToJson(
+      this,
+    );
+  }
 }
 
 abstract class Real implements Value {
   const factory Real(final double v) = _$Real;
+
+  factory Real.fromJson(Map<String, dynamic> json) = _$Real.fromJson;
 
   double get v;
   @JsonKey(ignore: true)
@@ -348,12 +394,17 @@ class __$$BoolCopyWithImpl<$Res> extends _$ValueCopyWithImpl<$Res, _$Bool>
 }
 
 /// @nodoc
-
+@JsonSerializable()
 class _$Bool implements Bool {
-  const _$Bool(this.v);
+  const _$Bool(this.v, {final String? $type}) : $type = $type ?? 'boolean';
+
+  factory _$Bool.fromJson(Map<String, dynamic> json) => _$$BoolFromJson(json);
 
   @override
   final bool v;
+
+  @JsonKey(name: 'runtimeType')
+  final String $type;
 
   @override
   String toString() {
@@ -368,6 +419,7 @@ class _$Bool implements Bool {
             (identical(other.v, v) || other.v == v));
   }
 
+  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(runtimeType, v);
 
@@ -444,10 +496,19 @@ class _$Bool implements Bool {
     }
     return orElse();
   }
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$BoolToJson(
+      this,
+    );
+  }
 }
 
 abstract class Bool implements Value {
   const factory Bool(final bool v) = _$Bool;
+
+  factory Bool.fromJson(Map<String, dynamic> json) = _$Bool.fromJson;
 
   bool get v;
   @JsonKey(ignore: true)
@@ -461,7 +522,7 @@ MeasurementValue _$MeasurementValueFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$MeasurementValue {
   String get sensor => throw _privateConstructorUsedError;
-  String get value => throw _privateConstructorUsedError;
+  Value get value => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -475,7 +536,9 @@ abstract class $MeasurementValueCopyWith<$Res> {
           MeasurementValue value, $Res Function(MeasurementValue) then) =
       _$MeasurementValueCopyWithImpl<$Res, MeasurementValue>;
   @useResult
-  $Res call({String sensor, String value});
+  $Res call({String sensor, Value value});
+
+  $ValueCopyWith<$Res> get value;
 }
 
 /// @nodoc
@@ -502,8 +565,16 @@ class _$MeasurementValueCopyWithImpl<$Res, $Val extends MeasurementValue>
       value: null == value
           ? _value.value
           : value // ignore: cast_nullable_to_non_nullable
-              as String,
+              as Value,
     ) as $Val);
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $ValueCopyWith<$Res> get value {
+    return $ValueCopyWith<$Res>(_value.value, (value) {
+      return _then(_value.copyWith(value: value) as $Val);
+    });
   }
 }
 
@@ -515,7 +586,10 @@ abstract class _$$_MeasurementValueCopyWith<$Res>
       __$$_MeasurementValueCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String sensor, String value});
+  $Res call({String sensor, Value value});
+
+  @override
+  $ValueCopyWith<$Res> get value;
 }
 
 /// @nodoc
@@ -540,7 +614,7 @@ class __$$_MeasurementValueCopyWithImpl<$Res>
       value: null == value
           ? _value.value
           : value // ignore: cast_nullable_to_non_nullable
-              as String,
+              as Value,
     ));
   }
 }
@@ -556,7 +630,7 @@ class _$_MeasurementValue implements _MeasurementValue {
   @override
   final String sensor;
   @override
-  final String value;
+  final Value value;
 
   @override
   String toString() {
@@ -593,7 +667,7 @@ class _$_MeasurementValue implements _MeasurementValue {
 abstract class _MeasurementValue implements MeasurementValue {
   const factory _MeasurementValue(
       {required final String sensor,
-      required final String value}) = _$_MeasurementValue;
+      required final Value value}) = _$_MeasurementValue;
 
   factory _MeasurementValue.fromJson(Map<String, dynamic> json) =
       _$_MeasurementValue.fromJson;
@@ -601,7 +675,7 @@ abstract class _MeasurementValue implements MeasurementValue {
   @override
   String get sensor;
   @override
-  String get value;
+  Value get value;
   @override
   @JsonKey(ignore: true)
   _$$_MeasurementValueCopyWith<_$_MeasurementValue> get copyWith =>

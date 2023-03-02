@@ -20,7 +20,7 @@ class ThermalMassSystem with Logging {
 
   late SetpointValueChannel temperatureChannel;
   late TypedMeasurementChannel<double> timeUpChannel;
-  late OnOffControlChannel heaterChannel;
+  late TypedMeasurementChannel<bool> heaterChannel;
   StreamController<double> temperatureTargetChannelController =
       StreamController<double>();
 
@@ -44,8 +44,8 @@ class ThermalMassSystem with Logging {
         .controlStream()
         .listen(onTemperatureCommand);
 
-    heaterChannel = OnOffControlChannel(Sampler.typed((t) => heaterOn));
-    heaterChannel.controlStream().listen(onHeaterCommand);
+    heaterChannel = Sampler.typed((t) => heaterOn);
+    // heaterChannel.controlStream().listen(onHeaterCommand);
   }
 
   void onTemperatureCommand(SetpointAction command) {

@@ -1,17 +1,17 @@
+import 'package:bioreact/channels.dart';
 import 'package:bioreact/screens/device_dashboard.dart';
 import 'package:bioreact/services.dart';
 import 'package:flutter/material.dart';
 
-void main() {
+void main() async {
+  await Services.instance.startMqtt();
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
   final Services services = Services.instance;
 
-  MyApp({super.key}) {
-    services.startMqtt();
-  }
+  MyApp({super.key}) {}
 
   // This widget is the root of your application.
   @override
@@ -36,6 +36,14 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  late BioreactorChannels bioreactorChannels;
+  @override
+  void initState() {
+    super.initState();
+    bioreactorChannels =
+        BioreactorChannels.mockup_mqtt(Services.instance.mqtt!);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -43,7 +51,7 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
       ),
       body: Center(
-        child: DeviceDashboard(services: Services.instance),
+        child: DeviceDashboard(channels: bioreactorChannels),
       ),
     );
   }
