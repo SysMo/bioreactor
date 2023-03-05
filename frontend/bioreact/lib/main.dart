@@ -11,7 +11,7 @@ void main() async {
 class MyApp extends StatelessWidget {
   final Services services = Services.instance;
 
-  MyApp({super.key}) {}
+  MyApp({super.key});
 
   // This widget is the root of your application.
   @override
@@ -40,8 +40,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    bioreactorChannels =
-        BioreactorChannels.mockup_mqtt(Services.instance.mqtt!);
+    bioreactorChannels = BioreactorChannels.mockupMqtt(Services.instance.mqtt!);
   }
 
   @override

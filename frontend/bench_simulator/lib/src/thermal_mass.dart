@@ -38,9 +38,9 @@ class ThermalMassSystem with Logging {
           advanceTime(t);
           return temperature;
         }),
-        setpointChannel: ControlChannel(TypedMeasurementChannel(
+        controlChannel: ControlChannel(TypedMeasurementChannel(
             temperatureTargetChannelController.stream)));
-    temperatureChannel.setpointChannel
+    temperatureChannel.controlChannel
         .controlStream()
         .listen(onTemperatureCommand);
 
@@ -59,9 +59,9 @@ class ThermalMassSystem with Logging {
     }
   }
 
-  void onHeaterCommand(OnOffAction command) {
-    // print("Got heater command: $command");
-  }
+  // void onHeaterCommand(OnOffAction command) {
+  //   // print("Got heater command: $command");
+  // }
 
   // @override
   void advanceTime(double t) {

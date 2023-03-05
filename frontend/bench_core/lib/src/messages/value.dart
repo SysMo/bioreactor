@@ -1,7 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-part 'messages.freezed.dart';
-part 'messages.g.dart';
+part 'value.freezed.dart';
+part 'value.g.dart';
 
 @freezed
 class Value with _$Value {
@@ -24,15 +24,4 @@ extension ValueExt on Value {
         real: (double v) => null,
         boolean: (bool v) => v,
       );
-}
-
-@freezed
-class MeasurementValue with _$MeasurementValue {
-  const factory MeasurementValue({
-    required String sensor,
-    required Value value,
-  }) = _MeasurementValue;
-
-  factory MeasurementValue.fromJson(Map<String, Object?> json) =>
-      _$MeasurementValueFromJson(json);
 }

@@ -1,6 +1,3 @@
-import 'dart:convert';
-
-import 'package:async/async.dart';
 import 'package:bench_core/channels.dart';
 import 'package:bench_core/log.dart';
 import 'package:bench_core/messages.dart';
@@ -54,6 +51,43 @@ class BioreactorChannels with Logging {
     );
   }
 
+  void deviceSide(MqttService mqtt, String topic) {
+    MeasurementChannelCommunicator(mqtt: mqtt, topic: "$topic/uptime")
+        .deviceSide(uptimeChannel);
+    SetpointChannelCommunicator(mqtt: mqtt, topic: "$topic/temperature")
+        .deviceSide(temperatureChannel);
+    MeasurementChannelCommunicator(mqtt: mqtt, topic: "$topic/heater")
+        .deviceSide(heaterChannel);
+    SetpointChannelCommunicator(mqtt: mqtt, topic: "$topic/stirrer_speed")
+        .deviceSide(stirrerSpeedChannel);
+    MeasurementChannelCommunicator(mqtt: mqtt, topic: "$topic/duty_cycle")
+        .deviceSide(dutyCycleChannel);
+  }
+
+  factory BioreactorChannels.mqtt(MqttService mqtt, String topic) {
+    double realDecoder(Value v) => v.asReal() ?? (throw TypeError());
+    bool boolDecoder(Value v) => v.asBool() ?? (throw TypeError());
+
+    var instance = BioreactorChannels(
+      uptimeChannel:
+          MeasurementChannelCommunicator(mqtt: mqtt, topic: "$topic/uptime")
+              .controlSide(realDecoder),
+      temperatureChannel:
+          SetpointChannelCommunicator(mqtt: mqtt, topic: "$topic/temperature")
+              .controlSide(),
+      heaterChannel:
+          MeasurementChannelCommunicator(mqtt: mqtt, topic: "$topic/heater")
+              .controlSide(boolDecoder),
+      stirrerSpeedChannel:
+          SetpointChannelCommunicator(mqtt: mqtt, topic: "$topic/stirrer_speed")
+              .controlSide(),
+      dutyCycleChannel:
+          MeasurementChannelCommunicator(mqtt: mqtt, topic: "$topic/duty_cycle")
+              .controlSide(realDecoder),
+    );
+    return instance;
+  }
+
   factory BioreactorChannels.mockup({bool applyDefaults = true}) {
     ThermalMassSystem thermalMassSystem = ThermalMassSystem();
     DCServoMotor motor = DCServoMotor();
@@ -71,41 +105,17 @@ class BioreactorChannels with Logging {
     return instance;
   }
 
-  factory BioreactorChannels.mockup_mqtt(MqttService mqtt,
+  /// Mockup over MQTT
+  /// ==========================================================================
+  factory BioreactorChannels.mockupMqtt(MqttService mqtt,
       {bool applyDefaults = true}) {
-    var instance = BioreactorChannels.mockup();
+    var topic = "sysmo/esp32/bio1";
+    BioreactorChannels.mockup().deviceSide(mqtt, topic);
+    var instance = BioreactorChannels.mqtt(mqtt, topic);
+    if (applyDefaults) {
+      instance._applyDefaults();
+    }
 
-    instance.temperatureChannel.measurementChannel.values.listen((v) {
-      var message = jsonEncode(
-          MeasurementValue(sensor: "temperature", value: Value.real(v)));
-      mqtt.publish("sysmo/esp32/bio1/sensors", message);
-    });
-
-    return BioreactorChannels.mqtt(mqtt);
-  }
-
-  factory BioreactorChannels.mqtt(MqttService mqtt) {
-    const JsonDecoder jsonDecoder = JsonDecoder();
-
-    Stream<MeasurementValue> subscriptionStream =
-        mqtt.subscribeToTopic("sysmo/esp32/bio1/sensors").map((event) {
-      return MeasurementValue.fromJson(jsonDecoder.convert(event));
-    });
-    StreamSplitter<MeasurementValue> splitter =
-        StreamSplitter(subscriptionStream);
-    var temperature = MeasurementChannel(splitter
-            .split()
-            .where((value) => value.sensor == "temperature")
-            .map((value) => value.value)
-            .asBroadcastStream())
-        .asReal();
-
-    splitter.close();
-
-    temperature.values.listen((value) {
-      print("Temperature is $temperature");
-    });
-    // Temporary
-    return BioreactorChannels.mockup();
+    return instance;
   }
 }

@@ -3,8 +3,8 @@ import 'package:bench_core/messages.dart';
 
 class Sampler {
   static Stream<T> periodicStream<T>(T Function(double) f) {
-    return Stream.periodic(const Duration(milliseconds: 100), (count) {
-      double t = count.toDouble() / 10.0;
+    return Stream.periodic(const Duration(milliseconds: 1000), (count) {
+      double t = count.toDouble() / 1.0;
       return f(t);
     });
   }

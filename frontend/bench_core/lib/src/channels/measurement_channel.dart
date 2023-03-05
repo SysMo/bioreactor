@@ -1,5 +1,6 @@
-import 'package:bench_core/src/messages/messages.dart';
+import 'package:bench_core/messages.dart';
 
+import '../../mqtt.dart';
 import 'value_formatter.dart';
 
 class WrongTypeException implements Exception {
@@ -65,10 +66,49 @@ class MeasurementChannel extends TypedMeasurementChannel<Value> {
     return result;
   }
 
-  TypedMeasurementChannel<double> asReal() => TypedMeasurementChannel(
-        values.map((x) {
-          double? xReal = x.asReal();
-          return (xReal != null) ? xReal : throw WrongTypeException("real");
-        }),
-      );
+  TypedMeasurementChannel<double> asReal() {
+    var instance = TypedMeasurementChannel(
+      values.map((x) {
+        double? xReal = x.asReal();
+        return (xReal != null) ? xReal : throw WrongTypeException("real");
+      }),
+    );
+    instance.copyProps(this);
+    return instance;
+  }
+
+  TypedMeasurementChannel<bool> asBool() {
+    var instance = TypedMeasurementChannel(
+      values.map((x) {
+        bool? xBool = x.asBool();
+        return (xBool != null) ? xBool : throw WrongTypeException("bool");
+      }),
+    );
+    instance.copyProps(this);
+    return instance;
+  }
+
+  TypedMeasurementChannel<T> asTyped<T>(T Function(Value) decoder) {
+    var instance = TypedMeasurementChannel<T>(values.map(decoder));
+    instance.copyProps(this);
+    return instance;
+  }
+}
+
+class MeasurementChannelCommunicator {
+  ValueStreamMqttConnector connector;
+
+  MeasurementChannelCommunicator(
+      {required MqttService mqtt, required String topic})
+      : connector = ValueStreamMqttConnector(mqtt: mqtt, topic: topic);
+
+  void deviceSide<T>(TypedMeasurementChannel<T> channel) {
+    connector.sender(channel.asUntyped().values);
+  }
+
+  TypedMeasurementChannel<T> controlSide<T>(T Function(Value) decoder) {
+    return MeasurementChannel(connector.receiver())
+        .asTyped<T>(decoder)
+        .asBroadcast();
+  }
 }

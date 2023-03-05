@@ -1,10 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
-// import 'dart:io';
-import 'log.dart';
+import '../log.dart';
 import 'package:mqtt_client/mqtt_client.dart' as mqtt;
 import 'package:mqtt_client/mqtt_server_client.dart';
-import 'messages/messages.dart';
 
 class MqttService with Logging {
   final String url;
@@ -21,8 +19,7 @@ class MqttService with Logging {
 
   Future<void> connect() async {
     // client.port = port;
-    // client;
-    client.logging(on: true);
+    // client.logging(on: true);
     client.keepAlivePeriod = 30;
     client.secure = true;
     // client.useWebSocket = true;
@@ -74,7 +71,7 @@ class MqttService with Logging {
         mqtt.MqttPublishPayload.bytesToStringAsString(recMess.payload.message);
     final String topic = event[0].topic;
 
-    logger.i("Received: [$topic] $message");
+    // logger.i("Received: [$topic] $message");
     StreamController? controller = topicControllers[topic];
     if (controller != null) {
       controller.add(message);

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:bench_core/channels.dart';
+import 'package:bench_core/messages.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 
 class SetpointValueControl extends StatefulWidget {
@@ -41,13 +42,13 @@ class _SetpointValueControlState extends State<SetpointValueControl> {
     });
 
     setpointSubscription =
-        spChannel.setpointChannel.measurementChannel.values.listen((event) {
+        spChannel.controlChannel.readerChannel.values.listen((event) {
       setState(() {
         setpointValue = event;
       });
     });
 
-    widget.channel.setpointChannel.dispatch(ReadTarget());
+    widget.channel.controlChannel.dispatch(const ReadTarget());
   }
 
   @override
@@ -58,14 +59,14 @@ class _SetpointValueControlState extends State<SetpointValueControl> {
   }
 
   void onvalueChanged(double value) {
-    widget.channel.setpointChannel.dispatch(SetTarget(value));
+    widget.channel.controlChannel.dispatch(SetTarget(value));
     setState(() {
       setpointValue = value;
     });
   }
 
   void onTargetChangeEnd(double newValue) {
-    widget.channel.setpointChannel.dispatch(ReadTarget());
+    widget.channel.controlChannel.dispatch(const ReadTarget());
   }
 
   @override
