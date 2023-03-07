@@ -52,14 +52,14 @@ class DCServoMotor with Logging {
     double dt = t - tCurrent;
     if (dt > tEps) {
       // Compute new state
-      dutyCycle += kProp * (omegaTarget - omega);
+      dutyCycle += kProp * (omegaTarget - omega) * dt;
       if (dutyCycle < 0.0) {
         dutyCycle = 0.0;
       } else if (dutyCycle > 1.0) {
         dutyCycle = 1.0;
       }
 
-      omega += 1.0 / kInertial * (dutyCycle - omega / kOmega);
+      omega += 1.0 / kInertial * (dutyCycle - omega / kOmega) * dt;
       // Update current time
       tCurrent = t;
     }
