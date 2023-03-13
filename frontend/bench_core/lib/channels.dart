@@ -1,16 +1,9 @@
 /// Communication channels for measurement and control.
 library channels;
 
-export 'src/channels/measurement_channel.dart'
-    show
-        MeasurementChannel,
-        TypedMeasurementChannel,
-        MeasurementChannelCommunicator;
-export 'src/channels/control_channel.dart';
-export 'src/channels/setpoint_value_channel.dart';
-export 'src/channels/value_formatter.dart'
-    show
-        ValueFormatter,
-        FixedNumberFormatter,
-        PercentFormatter,
-        BooleanFormatter;
+export 'src/channels/connectors.dart';
+export 'src/channels/channel_bus.dart';
+export 'src/channels/codec.dart';
+export 'src/channels/measurement_channel.dart';
+export 'src/channels/set_value_channel.dart';
+export 'src/channels/set_point_channel.dart';

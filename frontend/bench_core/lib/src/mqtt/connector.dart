@@ -19,6 +19,7 @@ class StreamMqttConnector<T> {
       required this.decode});
 
   void sender(Stream<T> s) {
+    print("Creating sender for topic $topic");
     s.listen((v) {
       var message = jsonEncode(encode(v));
       mqtt.publish(topic, message);
@@ -26,6 +27,7 @@ class StreamMqttConnector<T> {
   }
 
   Stream<T> receiver() {
+    print("Creating receiver for topic $topic");
     return mqtt
         .subscribeToTopic(topic)
         .map((event) => decode(jsonDecode(event)));

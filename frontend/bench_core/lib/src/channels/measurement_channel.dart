@@ -1,114 +1,66 @@
-import 'package:bench_core/messages.dart';
+import 'package:bench_core/src/channels/stream_channel.dart';
 
-import '../../mqtt.dart';
-import 'value_formatter.dart';
+import 'connectors.dart';
+import 'channel_bus.dart';
 
-class WrongTypeException implements Exception {
-  String targetType;
-  WrongTypeException(this.targetType);
-}
-
-class TypedMeasurementChannel<T> {
-  Stream<T> values;
-
-  String? label;
-  ValueFormatter? formatter;
-  String? unit;
-
-  copyProps<U>(TypedMeasurementChannel<U> other) {
-    label = other.label;
-    formatter = other.formatter;
-    unit = other.unit;
-  }
-
-  TypedMeasurementChannel<T> withProps(
-      {String? label, ValueFormatter? formatter, String? unit}) {
-    var result = TypedMeasurementChannel(values);
-    result.label = label ?? this.label;
-    result.formatter = formatter ?? this.formatter;
-    result.unit = unit ?? this.unit;
-    return result;
-  }
-
-  TypedMeasurementChannel(this.values);
-
-  TypedMeasurementChannel<T> asBroadcast() {
-    var result = TypedMeasurementChannel(values.asBroadcastStream());
-    result.copyProps(this);
-    return result;
-  }
-
-  MeasurementChannel asUntyped() {
-    if (T == double) {
-      MeasurementChannel result =
-          MeasurementChannel(values.map((v) => Value.real(v as double)));
-      result.copyProps(this);
-      return result;
-    } else if (T == bool) {
-      MeasurementChannel result =
-          MeasurementChannel(values.map((v) => Value.boolean(v as bool)));
-      result.copyProps(this);
-      return result;
-    } else {
-      throw UnimplementedError(
-          "Cannot convert the type ${T.toString()} to Value");
-    }
-  }
-}
-
-class MeasurementChannel extends TypedMeasurementChannel<Value> {
-  MeasurementChannel(super.values);
+class MeasurementChannel<V> implements ChannelBus {
+  ForwardStreamChannel<V> streamChannel;
+  MeasurementChannel({required String id, Stream<V>? valueStream})
+      : streamChannel = ForwardStreamChannel(id: id, valueStream: valueStream);
 
   @override
-  MeasurementChannel asBroadcast() {
-    var result = MeasurementChannel(values.asBroadcastStream());
-    result.copyProps(this);
-    return result;
+  ChannelTree deviceSideTree() => streamChannel.deviceSideTree();
+
+  @override
+  ChannelTree controlSideTree() => streamChannel.controlSideTree();
+
+  @override
+  // Not to be used, only for channel groups
+  String get busId => throw UnimplementedError();
+
+  @override
+  // Not to be used, only for channel groups
+  List<ChannelBus> get children => throw UnimplementedError();
+}
+
+class MeasurementDeviceConnector<V>
+    implements DeviceConnector<MeasurementChannel<V>> {
+  DeviceReader<V> deviceReader;
+  StreamController<V> readerController = StreamController();
+  MeasurementDeviceConnector(this.deviceReader);
+
+  @override
+  void connectForwardChannels(MeasurementChannel<V> bus) {
+    bus.streamChannel.connect(readerController.stream);
   }
 
-  TypedMeasurementChannel<double> asReal() {
-    var instance = TypedMeasurementChannel(
-      values.map((x) {
-        double? xReal = x.asReal();
-        return (xReal != null) ? xReal : throw WrongTypeException("real");
-      }),
-    );
-    instance.copyProps(this);
-    return instance;
+  @override
+  void connectReverseChannels(MeasurementChannel<V> bus) {
+    // Nothing to do here
   }
 
-  TypedMeasurementChannel<bool> asBool() {
-    var instance = TypedMeasurementChannel(
-      values.map((x) {
-        bool? xBool = x.asBool();
-        return (xBool != null) ? xBool : throw WrongTypeException("bool");
-      }),
-    );
-    instance.copyProps(this);
-    return instance;
-  }
-
-  TypedMeasurementChannel<T> asTyped<T>(T Function(Value) decoder) {
-    var instance = TypedMeasurementChannel<T>(values.map(decoder));
-    instance.copyProps(this);
-    return instance;
+  @override
+  void sample() {
+    readerController.add(deviceReader());
   }
 }
 
-class MeasurementChannelCommunicator {
-  ValueStreamMqttConnector connector;
+class MeasurementControlConnector<V>
+    extends ControlConnector<MeasurementChannel<V>> {
+  void Function(V value)? onValue;
 
-  MeasurementChannelCommunicator(
-      {required MqttService mqtt, required String topic})
-      : connector = ValueStreamMqttConnector(mqtt: mqtt, topic: topic);
+  MeasurementControlConnector(this.onValue);
 
-  void deviceSide<T>(TypedMeasurementChannel<T> channel) {
-    connector.sender(channel.asUntyped().values);
+  @override
+  void connectForwardChannels(MeasurementChannel<V> bus) {
+    bus.streamChannel.valueStream.listen((value) {
+      var onValue = this.onValue;
+      if (onValue != null) onValue(value);
+    });
   }
 
-  TypedMeasurementChannel<T> controlSide<T>(T Function(Value) decoder) {
-    return MeasurementChannel(connector.receiver())
-        .asTyped<T>(decoder)
-        .asBroadcast();
+  @override
+  void connectReverseChannels(MeasurementChannel<V> bus) {
+    // Nothing to do here
   }
 }

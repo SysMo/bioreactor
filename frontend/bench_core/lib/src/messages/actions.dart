@@ -1,45 +1,68 @@
-import 'package:bench_core/mqtt.dart';
+import 'dart:convert';
+import 'package:bench_core/src/channels/codec.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'actions.freezed.dart';
 part 'actions.g.dart';
 
-// abstract class Action {
-//   Map<String, Object?> toJson();
+@Freezed(genericArgumentFactories: true)
+class SetValueAction<V> with _$SetValueAction<V> {
+  const factory SetValueAction.setValue(V value) = SetValue<V>;
+  const factory SetValueAction.readValue() = ReadValue;
+
+  factory SetValueAction.fromJson(
+          Map<String, Object?> json, V Function(Object?) fromJsonT) =>
+      _$SetValueActionFromJson(json, fromJsonT);
+
+  static StringCodec<SetValueAction<V>> codec<V>() => _SetValueActionCodec<V>();
+}
+
+class _SetValueActionCodec<V> extends StringCodec<SetValueAction<V>> {
+  ObjectCodec<V> vCodec = ObjectCodecRegistry.getCodec<V>();
+  @override
+  SetValueAction<V> decode(String s) {
+    return SetValueAction.fromJson(jsonDecode(s), vCodec.decode);
+  }
+
+  @override
+  String encode(SetValueAction<V> value) {
+    return jsonEncode(value.toJson(vCodec.encode));
+  }
+}
+
+// @freezed
+// class FloatValueAction with _$FloatValueAction {
+//   const factory FloatValueAction.setValue(double value) = SetValue;
+//   const factory FloatValueAction.readValue() = ReadValue;
+
+//   factory FloatValueAction.fromJson(Map<String, Object?> json) =>
+//       _$FloatValueActionFromJson(json);
+
+//   static Codec<FloatValueAction> codec = _FloatValueActionCodec();
 // }
 
-// T actionFromJson<T extends Action>(Map<String, Object?> json) {
-//   if (T == SetpointAction) {
-//     return SetpointAction.fromJson(json) as T;
-//   } else {
-//     throw UnimplementedError(
-//         "actionFromJson cannot handle type ${T.runtimeType}");
-//   }
+// class _FloatValueActionCodec extends Codec<FloatValueAction> {
+//   @override
+//   FloatValueAction decode(String s) => FloatValueAction.fromJson(jsonDecode(s));
+
+//   @override
+//   String encode(FloatValueAction value) => jsonEncode(value.toJson());
 // }
 
 @freezed
-class SetpointAction with _$SetpointAction {
-  const factory SetpointAction.setTarget(double value) = SetTarget;
-  const factory SetpointAction.readTarget() = ReadTarget;
+class SetPointAction with _$SetPointAction {
+  const factory SetPointAction.setTarget(double value) = SetTarget;
+  const factory SetPointAction.readTarget() = ReadTarget;
 
-  factory SetpointAction.fromJson(Map<String, Object?> json) =>
-      _$SetpointActionFromJson(json);
+  factory SetPointAction.fromJson(Map<String, Object?> json) =>
+      _$SetPointActionFromJson(json);
+  static StringCodec<SetPointAction> codec = _SetPointActionCodec();
 }
 
-@freezed
-class ControlAction with _$ControlAction {
-  const factory ControlAction.setpointAction(SetpointAction a) =
-      SetpointActionConstr;
-
-  factory ControlAction.fromJson(Map<String, Object?> json) =>
-      _$ControlActionFromJson(json);
-}
-
-class SetpointActionCodec implements ActionCodec<SetpointAction> {
+class _SetPointActionCodec extends StringCodec<SetPointAction> {
   @override
-  SetpointAction decode(Map<String, Object?> json) =>
-      SetpointAction.fromJson(json);
+  SetPointAction decode(String s) => SetPointAction.fromJson(jsonDecode(s));
 
   @override
-  Map<String, Object?> encode(SetpointAction obj) => obj.toJson();
+  String encode(SetPointAction value) => jsonEncode(value.toJson());
 }

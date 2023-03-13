@@ -1,9 +1,6 @@
-import "dart:async";
-
 import 'package:bench_core/channels.dart';
 import 'package:bench_core/log.dart';
-import 'package:bench_core/messages.dart';
-import 'sampler.dart';
+import 'package:bench_simulator/bench_simulator.dart';
 
 class ThermalMassSystem with Logging {
   double temperature;
@@ -18,71 +15,123 @@ class ThermalMassSystem with Logging {
   double tCurrent = 0;
   double tEps = 1e-6;
 
-  late SetpointValueChannel temperatureChannel;
-  late TypedMeasurementChannel<double> timeUpChannel;
-  late TypedMeasurementChannel<bool> heaterChannel;
-  StreamController<double> temperatureTargetChannelController =
-      StreamController<double>();
-
   ThermalMassSystem({
     this.heatCapacity = 1000.0,
     this.heaterPower = 1000.0,
-    double initTemperature = 20,
+    double initTemperature = 25,
     double initTargetTemperature = 35,
   })  : temperature = initTemperature,
-        targetTemperature = initTargetTemperature {
-    timeUpChannel = Sampler.typed((t) => t);
-
-    temperatureChannel = SetpointValueChannel(
-        measurementChannel: Sampler.typed((t) {
-          advanceTime(t);
-          return temperature;
-        }),
-        controlChannel: ControlChannel(TypedMeasurementChannel(
-            temperatureTargetChannelController.stream)));
-    temperatureChannel.controlChannel
-        .controlStream()
-        .listen(onTemperatureCommand);
-
-    heaterChannel = Sampler.typed((t) => heaterOn);
-    // heaterChannel.controlStream().listen(onHeaterCommand);
-  }
-
-  void onTemperatureCommand(SetpointAction command) {
-    if (command is SetTarget) {
-      targetTemperature = command.value;
-    } else if (command is ReadTarget &&
-        temperatureTargetChannelController.hasListener) {
-      temperatureTargetChannelController.add(targetTemperature);
-    } else {
-      logger.w("Unknown command $command");
-    }
-  }
-
-  // void onHeaterCommand(OnOffAction command) {
-  //   // print("Got heater command: $command");
-  // }
+        targetTemperature = initTargetTemperature;
 
   // @override
-  void advanceTime(double t) {
-    var dt = t - tCurrent;
-    // Compute new state
-    if (dt > tEps) {
-      if ((temperature < targetTemperature - temperatureTolerance) &&
-          !heaterOn) {
-        heaterOn = true;
-        logger.i("Turning heater on");
-      } else if ((temperature > targetTemperature + temperatureTolerance) &&
-          heaterOn) {
-        heaterOn = false;
-        logger.i("Turning heater off");
-      }
-      double qDot = (heaterOn ? heaterPower : 0.0) -
-          heatLossConv * (temperature - ambientTemperature);
-      temperature += qDot / heatCapacity * dt;
+  void advanceTime(double tLast, double dt) {
+    double tCurrent = tLast + dt;
 
-      // Update current time
-      tCurrent = t;
+    // Compute new state
+    if ((temperature < targetTemperature - temperatureTolerance) && !heaterOn) {
+      heaterOn = true;
+      logger.i("Turning heater on");
+    } else if ((temperature > targetTemperature + temperatureTolerance) &&
+        heaterOn) {
+      heaterOn = false;
+      logger.i("Turning heater off");
     }
+    double qDot = (heaterOn ? heaterPower : 0.0) -
+        heatLossConv * (temperature - ambientTemperature);
+    temperature += qDot / heatCapacity * dt;
+  }
+}
+
+class ThermalBus extends ChannelBus {
+  SetPointChannel temperature;
+  MeasurementChannel<bool> heater;
+  ThermalBus._({
+    required this.temperature,
+    required this.heater,
+  });
+
+  factory ThermalBus() {
+    return ThermalBus._(
+      temperature: SetPointChannel(id: "temperature"),
+      heater: MeasurementChannel(id: "heater"),
+    );
+  }
+
+  @override
+  String get busId => "thermal";
+
+  @override
+  List<ChannelBus> get children => [temperature, heater];
+}
+
+class ThermalDeviceConnector extends DeviceConnector<ThermalBus> {
+  ThermalMassSystem device;
+  SetPointDeviceConnector temperature;
+  MeasurementDeviceConnector<bool> heater;
+
+  ThermalDeviceConnector._(
+    this.device, {
+    required this.temperature,
+    required this.heater,
+  });
+
+  factory ThermalDeviceConnector(ThermalMassSystem device) {
+    var temperatureConnector = SetPointDeviceConnector.fn(
+      currentValueReader: () => device.temperature,
+      targetValueReader: () => device.targetTemperature,
+      targetValueWriter: (v) => device.targetTemperature = v,
+    );
+
+    var heaterConnector = MeasurementDeviceConnector(
+      () => device.heaterOn,
+    );
+
+    return ThermalDeviceConnector._(
+      device,
+      temperature: temperatureConnector,
+      heater: heaterConnector,
+    );
+  }
+
+  @override
+  void sample() {
+    temperature.sample();
+    heater.sample();
+  }
+
+  @override
+  void connectForwardChannels(ThermalBus bus) {
+    temperature.connectForwardChannels(bus.temperature);
+    heater.connectForwardChannels(bus.heater);
+  }
+
+  @override
+  void connectReverseChannels(ThermalBus bus) {
+    temperature.connectReverseChannels(bus.temperature);
+  }
+}
+
+class ThermalControlConnector extends ControlConnector<ThermalBus> {
+  SetPointControlConnector temperature;
+  MeasurementControlConnector<bool> heater;
+  ThermalControlConnector({
+    Function(double value)? onTemperatureCurrentValue,
+    Function(double value)? onTemperatureTargetValue,
+    Function(bool value)? onHeaterValue,
+  })  : temperature = SetPointControlConnector(
+          onCurrentValue: onTemperatureCurrentValue,
+          onTargetReadValue: onTemperatureTargetValue,
+        ),
+        heater = MeasurementControlConnector<bool>(onHeaterValue);
+
+  @override
+  void connectForwardChannels(ThermalBus bus) {
+    temperature.connectForwardChannels(bus.temperature);
+    heater.connectForwardChannels(bus.heater);
+  }
+
+  @override
+  void connectReverseChannels(ThermalBus bus) {
+    temperature.connectReverseChannels(bus.temperature);
   }
 }

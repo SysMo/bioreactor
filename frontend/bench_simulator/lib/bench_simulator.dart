@@ -3,5 +3,6 @@
 /// More dartdocs go here.
 library bench_simulator;
 
-export 'src/dc_motor.dart' show DCServoMotor;
-export 'src/thermal_mass.dart' show ThermalMassSystem;
+export 'src/stirrer.dart';
+export 'src/thermal_mass.dart';
+export 'src/bioreactor.dart';
