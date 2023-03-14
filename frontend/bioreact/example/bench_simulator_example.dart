@@ -3,7 +3,9 @@ import 'dart:async';
 import 'package:bench_core/messages.dart';
 import 'package:bench_core/channels.dart';
 import 'package:bench_core/mqtt.dart';
-import 'package:bench_simulator/bench_simulator.dart';
+import 'package:bioreact/model/bioreactor.dart';
+import 'package:bioreact/model/thermal_mass.dart';
+import 'package:bioreact/model/stirrer.dart';
 
 double currentTime = 0;
 const double tEps = 1e-3;
@@ -16,7 +18,7 @@ void bioreactorDeviceSide(MqttService mqtt) {
   var deviceBus = BioreactorBus();
   connector.connectForwardChannels(deviceBus);
   var deviceBusTree = deviceBus.deviceSideTree();
-  deviceBusTree.connectMqtt(mqtt);
+  mqtt.connectBus(deviceBus.deviceSideTree());
   connector.connectReverseChannels(deviceBus);
 
   Timer.periodic(
@@ -51,7 +53,7 @@ void bioreactorControllerSide(MqttService mqtt) {
   );
 
   bioreactorControl.connectReverseChannels(clientBus);
-  clientBus.controlSideTree().connectMqtt(mqtt);
+  mqtt.connectBus(clientBus.controlSideTree());
   bioreactorControl.connectForwardChannels(clientBus);
 
   bioreactorControl.stirrer.onTime

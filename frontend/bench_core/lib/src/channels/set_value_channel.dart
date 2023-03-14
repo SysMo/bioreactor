@@ -1,7 +1,7 @@
 import 'package:bench_core/src/channels/stream_channel.dart';
 import 'package:bench_core/src/messages/actions.dart';
 import 'package:bench_core/src/named_tree.dart';
-
+import 'dart:async';
 import 'connectors.dart';
 import 'channel_bus.dart';
 
@@ -67,23 +67,48 @@ class SetValueDeviceConnector<V> extends DeviceConnector<SetValueChannel<V>> {
 class SetValueControlConnector<V> extends ControlConnector<SetValueChannel<V>> {
   StreamController<SetValueAction<V>> actionController = StreamController();
   void Function(V value)? onReadValue;
+  late StreamSubscription<V> onReadValueSubscription;
 
-  SetValueControlConnector(this.onReadValue);
+  SetValueControlConnector(void Function(V value)? onReadValue) {
+    if (onReadValue != null) {
+      this.onReadValue = onReadValue;
+    }
+  }
+
+  void setOnReadValue(void Function(V v) onReadValue) {
+    if (this.onReadValue == null) {
+      this.onReadValue = onReadValue;
+    } else {
+      throw StateError("onReadValue already set");
+    }
+  }
 
   void dispatch(SetValueAction<V> action) {
     actionController.add(action);
   }
 
+  void setValue(V value) {
+    dispatch(SetValueAction.setValue(value));
+  }
+
+  void readValue() {
+    dispatch(const SetValueAction.readValue());
+  }
+
   @override
   void connectForwardChannels(SetValueChannel<V> bus) {
-    var onReadValue = this.onReadValue;
     bus.reader.valueStream.listen((value) {
-      if (onReadValue != null) onReadValue(value);
+      if (onReadValue != null) onReadValue!(value);
     });
   }
 
   @override
   void connectReverseChannels(SetValueChannel<V> bus) {
     bus.action.connect(actionController.stream);
+  }
+
+  @override
+  void dispose() {
+    onReadValueSubscription.cancel();
   }
 }

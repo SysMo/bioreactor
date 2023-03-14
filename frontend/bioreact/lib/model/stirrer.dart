@@ -3,7 +3,7 @@ import 'package:bench_core/log.dart';
 
 class StirrerModel with Logging {
   double omega = 0.0;
-  double omegaTarget = 0.0;
+  double omegaTarget = 100.0;
   double dutyCycle = 0.0;
 
   double kInertial = 1e-3;
@@ -12,15 +12,15 @@ class StirrerModel with Logging {
 
   double tCurrent = 0.0;
 
-  double tOn = 5.0;
-  double tOff = 5.0;
+  double tOn = 1000.0;
+  double tOff = 0.0;
   double tLastSwitch = 0.0;
   bool isOn = true;
 
   void advanceTime(double tLast, double dt) {
     double tCurrent = tLast + dt;
 
-    if (isOn && (tCurrent - tLastSwitch > tOn)) {
+    if (isOn && (tCurrent - tLastSwitch > tOn) && (tOff > 0)) {
       isOn = false;
       tLastSwitch = tCurrent;
     } else if (!isOn && (tCurrent - tLastSwitch > tOff)) {
@@ -172,5 +172,13 @@ class StirrerControlConnector extends ControlConnector<StirrerBus> {
     speed.connectReverseChannels(bus.speed);
     onTime.connectReverseChannels(bus.onTime);
     offTime.connectReverseChannels(bus.offTime);
+  }
+
+  @override
+  void dispose() {
+    dutyCycle.dispose();
+    speed.dispose();
+    onTime.dispose();
+    offTime.dispose();
   }
 }

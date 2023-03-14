@@ -1,121 +1,167 @@
-import 'package:bench_core/channels.dart';
-import 'package:bench_core/log.dart';
-import 'package:bench_core/messages.dart';
-import 'package:bench_core/mqtt.dart';
-import 'package:bench_simulator/bench_simulator.dart';
-// import 'package:async/async.dart';
+// import 'package:bench_core/channels.dart';
+// import 'package:bench_core/log.dart';
+// import 'package:bench_core/messages.dart';
+// import 'package:bench_core/mqtt.dart';
+// import 'package:bench_simulator/bench_simulator.dart';
+// // import 'package:async/async.dart';
 
-class BioreactorChannels with Logging {
-  TypedMeasurementChannel<double> uptimeChannel;
-  SetpointValueChannel temperatureChannel;
-  TypedMeasurementChannel<bool> heaterChannel;
-  SetpointValueChannel stirrerSpeedChannel;
-  TypedMeasurementChannel<double> dutyCycleChannel;
+// class BioreactorChannels with Logging {
+//   TypedMeasurementChannel<double> uptimeChannel;
+//   SetpointValueChannel temperatureChannel;
+//   TypedMeasurementChannel<bool> heaterChannel;
+//   SetpointValueChannel stirrerSpeedChannel;
+//   TypedMeasurementChannel<double> dutyCycleChannel;
 
-  BioreactorChannels({
-    required this.uptimeChannel,
-    required this.temperatureChannel,
-    required this.heaterChannel,
-    required this.stirrerSpeedChannel,
-    required this.dutyCycleChannel,
-  });
+//   FloatControlChannel onTimeChannel;
+//   FloatControlChannel offTimeChannel;
 
-  void _applyDefaults() {
-    uptimeChannel = uptimeChannel.withProps(
-      label: "Uptime",
-      formatter: FixedNumberFormatter(precision: 0),
-      unit: "s",
-    );
+//   BioreactorChannels({
+//     required this.uptimeChannel,
+//     required this.temperatureChannel,
+//     required this.heaterChannel,
+//     required this.stirrerSpeedChannel,
+//     required this.dutyCycleChannel,
+//     required this.onTimeChannel,
+//     required this.offTimeChannel,
+//   });
 
-    temperatureChannel.measurementChannel =
-        temperatureChannel.measurementChannel.withProps(
-      label: "Temperature",
-      formatter: FixedNumberFormatter(precision: 1),
-      unit: "C",
-    );
+//   void _applyDefaults() {
+//     uptimeChannel = uptimeChannel.withProps(
+//       label: "Uptime",
+//       formatter: FixedNumberFormatter(precision: 0),
+//       unit: "s",
+//     );
 
-    heaterChannel =
-        heaterChannel.withProps(label: "Heater", formatter: BooleanFormatter());
+//     temperatureChannel.measurementChannel =
+//         temperatureChannel.measurementChannel.withProps(
+//       label: "Temperature",
+//       formatter: FixedNumberFormatter(precision: 1),
+//       unit: "C",
+//     );
 
-    stirrerSpeedChannel.measurementChannel =
-        stirrerSpeedChannel.measurementChannel.withProps(
-      label: "Stirrer speed",
-      formatter: FixedNumberFormatter(precision: 0),
-      unit: "rpm",
-    );
+//     heaterChannel =
+//         heaterChannel.withProps(label: "Heater", formatter: BooleanFormatter());
 
-    dutyCycleChannel = dutyCycleChannel.withProps(
-      label: "PWM duty cycle",
-      formatter: PercentFormatter(precision: 0),
-      unit: "%",
-    );
-  }
+//     stirrerSpeedChannel.measurementChannel =
+//         stirrerSpeedChannel.measurementChannel.withProps(
+//       label: "Stirrer speed",
+//       formatter: FixedNumberFormatter(precision: 0),
+//       unit: "rpm",
+//     );
 
-  void deviceSide(MqttService mqtt, String topic) {
-    MeasurementChannelCommunicator(mqtt: mqtt, topic: "$topic/uptime")
-        .deviceSide(uptimeChannel);
-    SetpointChannelCommunicator(mqtt: mqtt, topic: "$topic/temperature")
-        .deviceSide(temperatureChannel);
-    MeasurementChannelCommunicator(mqtt: mqtt, topic: "$topic/heater")
-        .deviceSide(heaterChannel);
-    SetpointChannelCommunicator(mqtt: mqtt, topic: "$topic/stirrer_speed")
-        .deviceSide(stirrerSpeedChannel);
-    MeasurementChannelCommunicator(mqtt: mqtt, topic: "$topic/duty_cycle")
-        .deviceSide(dutyCycleChannel);
-  }
+//     dutyCycleChannel = dutyCycleChannel.withProps(
+//       label: "PWM duty cycle",
+//       formatter: PercentFormatter(precision: 0),
+//       unit: "%",
+//     );
 
-  factory BioreactorChannels.mqtt(MqttService mqtt, String topic) {
-    double realDecoder(Value v) => v.asReal() ?? (throw TypeError());
-    bool boolDecoder(Value v) => v.asBool() ?? (throw TypeError());
+//     onTimeChannel.readerChannel = onTimeChannel.readerChannel.withProps(
+//       label: "Stirrer on time",
+//       formatter: FixedNumberFormatter(precision: 0),
+//       unit: "min",
+//     );
 
-    var instance = BioreactorChannels(
-      uptimeChannel:
-          MeasurementChannelCommunicator(mqtt: mqtt, topic: "$topic/uptime")
-              .controlSide(realDecoder),
-      temperatureChannel:
-          SetpointChannelCommunicator(mqtt: mqtt, topic: "$topic/temperature")
-              .controlSide(),
-      heaterChannel:
-          MeasurementChannelCommunicator(mqtt: mqtt, topic: "$topic/heater")
-              .controlSide(boolDecoder),
-      stirrerSpeedChannel:
-          SetpointChannelCommunicator(mqtt: mqtt, topic: "$topic/stirrer_speed")
-              .controlSide(),
-      dutyCycleChannel:
-          MeasurementChannelCommunicator(mqtt: mqtt, topic: "$topic/duty_cycle")
-              .controlSide(realDecoder),
-    );
-    return instance;
-  }
+//     offTimeChannel.readerChannel = offTimeChannel.readerChannel.withProps(
+//       label: "Stirrer off time",
+//       formatter: FixedNumberFormatter(precision: 0),
+//       unit: "min",
+//     );
+//   }
 
-  factory BioreactorChannels.mockup({bool applyDefaults = true}) {
-    ThermalMassSystem thermalMassSystem = ThermalMassSystem();
-    DCServoMotor motor = DCServoMotor();
-    var instance = BioreactorChannels(
-      uptimeChannel: thermalMassSystem.timeUpChannel,
-      temperatureChannel: thermalMassSystem.temperatureChannel,
-      heaterChannel: thermalMassSystem.heaterChannel,
-      stirrerSpeedChannel: motor.speedChannel,
-      dutyCycleChannel: motor.dutyCycleChannel,
-    );
-    if (applyDefaults) {
-      instance._applyDefaults();
-    }
+//   void deviceSide(MqttService mqtt, String topic) {
+//     MeasurementChannelCommunicator(mqtt: mqtt, topic: "$topic/uptime")
+//         .deviceSide(uptimeChannel);
+//     SetpointChannelCommunicator(mqtt: mqtt, topic: "$topic/temperature")
+//         .deviceSide(temperatureChannel);
+//     MeasurementChannelCommunicator(mqtt: mqtt, topic: "$topic/heater")
+//         .deviceSide(heaterChannel);
+//     SetpointChannelCommunicator(mqtt: mqtt, topic: "$topic/stirrer_speed")
+//         .deviceSide(stirrerSpeedChannel);
+//     MeasurementChannelCommunicator(mqtt: mqtt, topic: "$topic/duty_cycle")
+//         .deviceSide(dutyCycleChannel);
+//     ControlChannelCommunicator<double, FloatValueAction>(
+//             mqtt: mqtt,
+//             topic: "$topic/on_time",
+//             actionCodec: FloatValueAction.codec)
+//         .deviceSide(onTimeChannel);
+//     ControlChannelCommunicator<double, FloatValueAction>(
+//             mqtt: mqtt,
+//             topic: "$topic/off_time",
+//             actionCodec: FloatValueAction.codec)
+//         .deviceSide(offTimeChannel);
+//   }
 
-    return instance;
-  }
+//   factory BioreactorChannels.mqtt(MqttService mqtt, String topic) {
+//     double floatDecoder(Value v) => v.asReal() ?? (throw TypeError());
+//     double floatDebugDecoder(Value v) {
+//       print("Value: $v");
+//       return v.asReal() ?? (throw TypeError());
+//     }
 
-  /// Mockup over MQTT
-  /// ==========================================================================
-  factory BioreactorChannels.mockupMqtt(MqttService mqtt,
-      {bool applyDefaults = true}) {
-    var topic = "sysmo/esp32/bio1";
-    BioreactorChannels.mockup().deviceSide(mqtt, topic);
-    var instance = BioreactorChannels.mqtt(mqtt, topic);
-    if (applyDefaults) {
-      instance._applyDefaults();
-    }
+//     bool boolDecoder(Value v) => v.asBool() ?? (throw TypeError());
 
-    return instance;
-  }
-}
+//     var instance = BioreactorChannels(
+//       uptimeChannel:
+//           MeasurementChannelCommunicator(mqtt: mqtt, topic: "$topic/uptime")
+//               .controlSide(floatDecoder),
+//       temperatureChannel:
+//           SetpointChannelCommunicator(mqtt: mqtt, topic: "$topic/temperature")
+//               .controlSide(),
+//       heaterChannel:
+//           MeasurementChannelCommunicator(mqtt: mqtt, topic: "$topic/heater")
+//               .controlSide(boolDecoder),
+//       stirrerSpeedChannel:
+//           SetpointChannelCommunicator(mqtt: mqtt, topic: "$topic/stirrer_speed")
+//               .controlSide(),
+//       dutyCycleChannel:
+//           MeasurementChannelCommunicator(mqtt: mqtt, topic: "$topic/duty_cycle")
+//               .controlSide(floatDecoder),
+//       onTimeChannel: ControlChannelCommunicator<double, FloatValueAction>(
+//               mqtt: mqtt,
+//               topic: "$topic/on_time",
+//               actionCodec: FloatValueAction.codec)
+//           .controlSide(floatDebugDecoder),
+//       offTimeChannel: ControlChannelCommunicator<double, FloatValueAction>(
+//               mqtt: mqtt,
+//               topic: "$topic/off_time",
+//               actionCodec: FloatValueAction.codec)
+//           .controlSide(floatDebugDecoder),
+//     );
+//     return instance;
+//   }
+
+//   factory BioreactorChannels.mockup({bool applyDefaults = true}) {
+//     ThermalMassSystem thermalMassSystem = ThermalMassSystem();
+//     StirrerModel motor = StirrerModel();
+//     var instance = BioreactorChannels(
+//       uptimeChannel: thermalMassSystem.timeUpChannel,
+//       temperatureChannel: thermalMassSystem.temperatureChannel,
+//       heaterChannel: thermalMassSystem.heaterChannel,
+//       stirrerSpeedChannel: motor.speedChannel,
+//       dutyCycleChannel: motor.dutyCycleChannel,
+//       onTimeChannel: motor.onTimeControl.controlChannel,
+//       offTimeChannel: motor.offTimeControl.controlChannel,
+//     );
+//     if (applyDefaults) {
+//       instance._applyDefaults();
+//     }
+
+//     return instance;
+//   }
+
+//   /// Mockup over MQTT
+//   /// ==========================================================================
+//   factory BioreactorChannels.mockupMqtt(MqttService mqtt,
+//       {bool applyDefaults = true}) {
+//     var topic = "sysmo/esp32/bio1";
+//     // Connect control side to Mqtt
+//     var instance = BioreactorChannels.mqtt(mqtt, topic);
+//     if (applyDefaults) {
+//       instance._applyDefaults();
+//     }
+//     // Connect device side to Mqtt
+//     BioreactorChannels.mockup().deviceSide(mqtt, topic);
+
+//     return instance;
+//   }
+// }

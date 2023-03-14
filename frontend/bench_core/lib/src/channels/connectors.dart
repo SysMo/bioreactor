@@ -26,4 +26,6 @@ abstract class ControlConnector<B extends ChannelBus> {
       }
     });
   }
+
+  void dispose();
 }

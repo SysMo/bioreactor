@@ -19,25 +19,6 @@ class InterfaceGroup extends CommunicationInterface {}
 
 typedef ChannelTree = TreeNode<CommunicationInterface>;
 
-extension ChannelTreeConnector on ChannelTree {
-  connectMqtt(MqttService mqtt) {
-    visitLeafs((channel) {
-      var channelId = channel.qualifiedPath.asString(sep: "/");
-      if (channel.props is SendingEnd) {
-        print("Will publish on $channelId");
-        (channel.props as SendingEnd).encodedStream.listen((data) {
-          // print("[$channelId] $data");
-          mqtt.publish(channelId, data);
-        });
-      } else {
-        print("Subscribing to $channelId");
-        (channel.props as ReceivingEnd)
-            .streamSetter(mqtt.subscribeToTopic(channelId).asBroadcastStream());
-      }
-    });
-  }
-}
-
 abstract class ChannelBus {
   static TreeBranch<CommunicationInterface> empty(String id) {
     return TreeBranch<CommunicationInterface>.empty(

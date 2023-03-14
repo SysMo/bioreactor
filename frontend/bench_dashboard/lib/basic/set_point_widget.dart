@@ -1,72 +1,60 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
+// import 'dart:async';
 import 'package:bench_core/channels.dart';
-import 'package:bench_core/messages.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 
-class SetpointValueControl extends StatefulWidget {
+class SetPointWidget extends StatefulWidget {
   final String title;
   final double minimum;
   final double maximum;
-  final SetpointValueChannel channel;
+  final SetPointControlConnector connector;
 
-  const SetpointValueControl(
+  const SetPointWidget(
       {super.key,
       required this.title,
-      required this.channel,
+      required this.connector,
       this.minimum = 0.0,
       this.maximum = 100.0});
 
   @override
-  State<SetpointValueControl> createState() => _SetpointValueControlState();
+  State<SetPointWidget> createState() => _SetPointWidgetState();
 }
 
-class _SetpointValueControlState extends State<SetpointValueControl> {
+class _SetPointWidgetState extends State<SetPointWidget> {
   double? measuredValue;
   double? setpointValue;
-
-  late StreamSubscription measurementSubscription;
-  late StreamSubscription setpointSubscription;
 
   @override
   void initState() {
     super.initState();
 
-    var spChannel = widget.channel;
+    widget.connector.currentConnector.setOnValue((v) => setState(() {
+          measuredValue = v;
+        }));
 
-    measurementSubscription =
-        spChannel.measurementChannel.values.listen((event) {
-      setState(() {
-        measuredValue = event;
-      });
-    });
+    widget.connector.targetConnector.setOnReadValue((v) => setState(() {
+          setpointValue = v;
+        }));
 
-    setpointSubscription =
-        spChannel.controlChannel.readerChannel.values.listen((event) {
-      setState(() {
-        setpointValue = event;
-      });
-    });
-
-    widget.channel.controlChannel.dispatch(const ReadTarget());
+    widget.connector.targetConnector.readValue();
   }
 
   @override
   void dispose() {
-    measurementSubscription.cancel();
-    setpointSubscription.cancel();
+    widget.connector.dispose();
     super.dispose();
   }
 
   void onvalueChanged(double value) {
-    widget.channel.controlChannel.dispatch(SetTarget(value));
     setState(() {
       setpointValue = value;
     });
   }
 
   void onTargetChangeEnd(double newValue) {
-    widget.channel.controlChannel.dispatch(const ReadTarget());
+    widget.connector.targetConnector.setValue(newValue);
+    // Redundant
+    // widget.connector.targetConnector.readValue();
   }
 
   @override

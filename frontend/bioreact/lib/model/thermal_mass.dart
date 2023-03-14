@@ -134,4 +134,10 @@ class ThermalControlConnector extends ControlConnector<ThermalBus> {
   void connectReverseChannels(ThermalBus bus) {
     temperature.connectReverseChannels(bus.temperature);
   }
+
+  @override
+  void dispose() {
+    temperature.dispose();
+    heater.dispose();
+  }
 }

@@ -1,6 +1,7 @@
-import 'package:bioreact/channels.dart';
+import 'package:bioreact/model/bioreactor.dart';
 import 'package:bioreact/screens/device_dashboard.dart';
 import 'package:bioreact/services.dart';
+import 'package:bench_core/channels.dart';
 import 'package:flutter/material.dart';
 
 void main() async {
@@ -36,11 +37,19 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  late BioreactorChannels bioreactorChannels;
+  late BioreactorDeviceConnector deviceConnector;
+  late BioreactorControlConnector controlConnector =
+      BioreactorControlConnector.empty();
   @override
   void initState() {
+    var mqtt = Services.instance.mqtt!;
+    deviceConnector = BioreactorDeviceConnector.mockupMqtt(mqtt);
+
     super.initState();
-    bioreactorChannels = BioreactorChannels.mockupMqtt(Services.instance.mqtt!);
+    var clientBus = BioreactorBus();
+    controlConnector.connectReverseChannels(clientBus);
+    mqtt.connectBus(clientBus.controlSideTree());
+    controlConnector.connectForwardChannels(clientBus);
   }
 
   @override
@@ -50,7 +59,9 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
       ),
       body: Center(
-        child: DeviceDashboard(channels: bioreactorChannels),
+        child: DeviceDashboard(
+          connector: controlConnector,
+        ),
       ),
     );
   }

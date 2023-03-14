@@ -3,7 +3,6 @@ import 'connectors.dart';
 import 'measurement_channel.dart';
 import 'set_value_channel.dart';
 import 'package:bench_core/src/messages/actions.dart';
-import 'package:bench_core/src/named_tree.dart';
 
 class SetPointChannel extends ChannelBus {
   String id;
@@ -94,5 +93,11 @@ class SetPointControlConnector extends ControlConnector<SetPointChannel> {
   @override
   void connectReverseChannels(SetPointChannel bus) {
     targetConnector.connectReverseChannels(bus.target);
+  }
+
+  @override
+  void dispose() {
+    currentConnector.dispose();
+    targetConnector.dispose();
   }
 }

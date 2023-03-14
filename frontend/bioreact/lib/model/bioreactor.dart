@@ -1,5 +1,6 @@
 import 'package:bench_core/channels.dart';
-
+import 'package:bench_core/mqtt.dart';
+import 'dart:async';
 import 'thermal_mass.dart';
 import 'stirrer.dart';
 
@@ -59,6 +60,31 @@ class BioreactorDeviceConnector extends DeviceConnector<BioreactorBus> {
     );
   }
 
+  factory BioreactorDeviceConnector.mockupMqtt(MqttService mqtt) {
+    double currentTime = 0;
+    const double tEps = 1e-3;
+    const double dt = 1.0;
+
+    var bioreactor = BioreactorModel();
+    var connector = BioreactorDeviceConnector(bioreactor);
+    var deviceBus = BioreactorBus();
+    connector.connectForwardChannels(deviceBus);
+    mqtt.connectBus(deviceBus.deviceSideTree());
+    connector.connectReverseChannels(deviceBus);
+
+    Timer.periodic(
+      Duration(milliseconds: (1000 * dt).toInt()),
+      (timer) {
+        bioreactor.advanceTime(currentTime, dt);
+        currentTime += dt;
+        print("t = $currentTime");
+        connector.sample();
+      },
+    );
+
+    return connector;
+  }
+
   @override
   void connectForwardChannels(BioreactorBus bus) {
     thermal.connectForwardChannels(bus.thermal);
@@ -84,6 +110,13 @@ class BioreactorControlConnector extends ControlConnector<BioreactorBus> {
 
   BioreactorControlConnector({required this.thermal, required this.stirrer});
 
+  factory BioreactorControlConnector.empty() {
+    return BioreactorControlConnector(
+      stirrer: StirrerControlConnector(),
+      thermal: ThermalControlConnector(),
+    );
+  }
+
   @override
   void connectForwardChannels(BioreactorBus bus) {
     thermal.connectForwardChannels(bus.thermal);
@@ -94,5 +127,11 @@ class BioreactorControlConnector extends ControlConnector<BioreactorBus> {
   void connectReverseChannels(BioreactorBus bus) {
     thermal.connectReverseChannels(bus.thermal);
     stirrer.connectReverseChannels(bus.stirrer);
+  }
+
+  @override
+  void dispose() {
+    thermal.dispose();
+    stirrer.dispose();
   }
 }
