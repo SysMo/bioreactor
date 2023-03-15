@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:bench_core/messages.dart';
-import 'package:bench_core/channels.dart';
 import 'package:bench_core/mqtt.dart';
 import 'package:bioreact/model/bioreactor.dart';
 import 'package:bioreact/model/thermal_mass.dart';
@@ -17,7 +16,6 @@ void bioreactorDeviceSide(MqttService mqtt) {
   var connector = BioreactorDeviceConnector(bioreactor);
   var deviceBus = BioreactorBus();
   connector.connectForwardChannels(deviceBus);
-  var deviceBusTree = deviceBus.deviceSideTree();
   mqtt.connectBus(deviceBus.deviceSideTree());
   connector.connectReverseChannels(deviceBus);
 

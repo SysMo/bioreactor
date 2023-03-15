@@ -79,8 +79,8 @@ class SetPointControlConnector extends ControlConnector<SetPointChannel> {
   SetValueControlConnector<double> targetConnector;
 
   SetPointControlConnector({
-    Function(double value)? onCurrentValue,
-    Function(double value)? onTargetReadValue,
+    OnValueFn<double>? onCurrentValue,
+    OnValueFn<double>? onTargetReadValue,
   })  : currentConnector = MeasurementControlConnector<double>(onCurrentValue),
         targetConnector = SetValueControlConnector<double>(onTargetReadValue);
 

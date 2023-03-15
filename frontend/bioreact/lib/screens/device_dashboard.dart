@@ -1,7 +1,7 @@
 import '../model/bioreactor.dart';
 import 'package:flutter/material.dart';
 import 'package:bench_dashboard/basic.dart';
-// import 'package:bench_dashboard/composite.dart';
+import 'package:bench_dashboard/composite.dart';
 import 'package:bench_dashboard/layouts.dart';
 
 class DeviceDashboard extends StatefulWidget {
@@ -22,13 +22,13 @@ class _DeviceDashboardState extends State<DeviceDashboard> {
     var connector = widget.connector;
     return DashboardLayout(
       children: [
-        // StatusOverwiew(channels: [
-        //   channels.uptimeChannel.asUntyped(),
-        //   channels.temperatureChannel.measurementChannel.asUntyped(),
-        //   channels.heaterChannel.asUntyped(),
-        //   channels.stirrerSpeedChannel.measurementChannel.asUntyped(),
-        //   channels.dutyCycleChannel.asUntyped(),
-        // ]),
+        StatusOverwiew(connectors: [
+          // channels.uptimeChannel.asUntyped(),
+          connector.thermal.temperature.currentConnector,
+          connector.thermal.heater,
+          connector.stirrer.speed.currentConnector,
+          connector.stirrer.dutyCycle,
+        ]),
         SetPointWidget(
           title: "Temperature [C]",
           connector: connector.thermal.temperature,

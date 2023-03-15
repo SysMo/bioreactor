@@ -1,4 +1,3 @@
-import 'package:bench_core/mqtt.dart';
 import 'package:bench_core/src/named_tree.dart';
 
 enum ChannelDirection { forward, reverse }

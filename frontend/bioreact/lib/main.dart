@@ -1,7 +1,6 @@
 import 'package:bioreact/model/bioreactor.dart';
 import 'package:bioreact/screens/device_dashboard.dart';
 import 'package:bioreact/services.dart';
-import 'package:bench_core/channels.dart';
 import 'package:flutter/material.dart';
 
 void main() async {

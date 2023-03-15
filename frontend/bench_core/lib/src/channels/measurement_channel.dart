@@ -2,6 +2,7 @@ import 'package:bench_core/src/channels/stream_channel.dart';
 import 'dart:async';
 import 'connectors.dart';
 import 'channel_bus.dart';
+import 'formatter.dart';
 
 class MeasurementChannel<V> implements ChannelBus {
   ForwardStreamChannel<V> streamChannel;
@@ -47,27 +48,38 @@ class MeasurementDeviceConnector<V>
 
 class MeasurementControlConnector<V>
     extends ControlConnector<MeasurementChannel<V>> {
-  void Function(V value)? onValue;
+  List<OnValueFn<V>> onValue = [];
+  Formatter<V>? formatter;
+  String? label;
+  String? unit;
   late StreamSubscription<V> onValueSubscription;
 
-  MeasurementControlConnector(void Function(V value)? onValue) {
-    if (onValue == null) {
-      this.onValue = onValue;
+  MeasurementControlConnector(OnValueFn<V>? onValue) {
+    if (onValue != null) {
+      this.onValue.add(onValue);
     }
   }
 
-  void setOnValue(void Function(V v) onValue) {
-    if (this.onValue == null) {
-      this.onValue = onValue;
-    } else {
-      throw StateError("onValue already set");
-    }
+  void setOnValue(OnValueFn<V> onValue) {
+    this.onValue.add(onValue);
+  }
+
+  void configure({
+    Formatter<V>? formatter,
+    String? label,
+    String? unit,
+  }) {
+    if (formatter != null) this.formatter = formatter;
+    if (label != null) this.label = label;
+    if (unit != null) this.unit = unit;
   }
 
   @override
   void connectForwardChannels(MeasurementChannel<V> bus) {
     onValueSubscription = bus.streamChannel.valueStream.listen((value) {
-      if (onValue != null) onValue!(value);
+      for (var f in onValue) {
+        f(value);
+      }
     });
   }
 

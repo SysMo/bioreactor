@@ -1,6 +1,5 @@
 import 'package:bench_core/src/channels/stream_channel.dart';
 import 'package:bench_core/src/messages/actions.dart';
-import 'package:bench_core/src/named_tree.dart';
 import 'dart:async';
 import 'connectors.dart';
 import 'channel_bus.dart';

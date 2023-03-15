@@ -58,20 +58,26 @@ abstract class Quantity {
 }
 
 class Time extends Quantity {
+  @override
   String get name => "Time";
+  @override
   Unit get siUnit => Units.second;
 
   Time({required super.unit, required super.value});
 }
 
 class Temperature extends Quantity {
+  @override
   String get name => "Temperature";
+  @override
   Unit get siUnit => Units.K;
   Temperature({required super.unit, required super.value});
 }
 
 class DutyCycle extends Quantity {
+  @override
   String get name => "Duty cycle";
+  @override
   Unit get siUnit => Units.fraction;
   DutyCycle({required super.unit, required super.value});
 }

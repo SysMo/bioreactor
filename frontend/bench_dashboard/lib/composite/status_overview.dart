@@ -1,92 +1,90 @@
-// import 'dart:async';
+import 'package:bench_core/channels.dart';
+import 'package:flutter/material.dart';
 
-// import 'package:bench_core/channels.dart';
-// import 'package:bench_core/messages.dart';
-// import 'package:flutter/material.dart';
-// import 'package:collection/collection.dart';
+import 'package:collection/collection.dart';
 
-// mixin HasSubscriptions {
-//   List<StreamSubscription<Value>> subscriptions = [];
-//   List<Value> values = [];
+typedef StateUpdateFn = void Function(void Function());
 
-//   void Function(void Function())? onSubscriptionValue;
+mixin HasValues {
+  List<Value> values = [];
 
-//   void subscribe(
-//     Stream<Value> stream,
-//   ) {
-//     int i = subscriptions.length;
-//     values.add(const Value.none());
-//     subscriptions.add(stream.listen((value) {
-//       if (onSubscriptionValue != null) {
-//         onSubscriptionValue!(() {
-//           values[i] = value;
-//         });
-//       }
-//     }));
-//   }
+  void connect(List<MeasurementControlConnector> connectors,
+      StateUpdateFn stateUpdateFn) {
+    void connectingFn(MeasurementControlConnector connector) {
+      var index = values.length;
+      values.add("N/A");
+      connector.setOnValue((v) {
+        stateUpdateFn(() {
+          values[index] = v;
+        });
+      });
+    }
 
-//   void cancelAllSubscriptions() {
-//     for (var sub in subscriptions) {
-//       sub.cancel();
-//     }
-//   }
-// }
+    for (var connector in connectors) {
+      connectingFn(connector);
+    }
+  }
 
-// class StatusOverwiew extends StatefulWidget {
-//   final List<MeasurementChannel> channels;
-//   const StatusOverwiew({super.key, required this.channels});
+  void disconnect(List<MeasurementControlConnector> connectors) {
+    for (var connector in connectors) {
+      connector.dispose();
+    }
+  }
+}
 
-//   @override
-//   State<StatusOverwiew> createState() => _StatusOverwiewState();
-// }
+class StatusOverwiew extends StatefulWidget {
+  final List<MeasurementControlConnector> connectors;
+  const StatusOverwiew({super.key, required this.connectors});
 
-// class _StatusOverwiewState extends State<StatusOverwiew> with HasSubscriptions {
-//   @override
-//   void initState() {
-//     super.initState();
-//     for (var channel in widget.channels) {
-//       subscribe(channel.values);
-//     }
-//     onSubscriptionValue = setState;
-//   }
+  @override
+  State<StatusOverwiew> createState() => _StatusOverwiewState();
+}
 
-//   @override
-//   void dispose() {
-//     super.dispose();
-//     cancelAllSubscriptions();
-//   }
+class _StatusOverwiewState extends State<StatusOverwiew> with HasValues {
+  @override
+  void initState() {
+    super.initState();
+    connect(widget.connectors, setState);
+  }
 
-//   @override
-//   Widget build(BuildContext context) {
-//     setState(() {});
-//     return Table(
-//       border: TableBorder.all(color: Colors.grey),
-//       columnWidths: const {
-//         0: FractionColumnWidth(0.7),
-//         1: FractionColumnWidth(0.3),
-//       },
-//       children: values
-//           .mapIndexed(
-//             (index, value) => buildRow(index, value),
-//           )
-//           .toList(),
-//     );
-//   }
+  @override
+  void dispose() {
+    disconnect(widget.connectors);
+    super.dispose();
+  }
 
-//   TableRow buildRow(int index, Value value) {
-//     String valueText =
-//         widget.channels[index].formatter?.format(value) ?? value.toString();
-//     String description = widget.channels[index].label ?? "Value";
-//     String unit = (widget.channels[index].unit ?? "");
-//     String label = "$description [$unit]";
+  @override
+  Widget build(BuildContext context) {
+    setState(() {});
+    return Table(
+      border: TableBorder.all(color: Colors.grey),
+      columnWidths: const {
+        0: FractionColumnWidth(0.7),
+        1: FractionColumnWidth(0.3),
+      },
+      children: values
+          .mapIndexed(
+            (index, value) => buildRow(index, value),
+          )
+          .toList(),
+    );
+  }
 
-//     List<Widget> children = [Text(label), Text(valueText)].map((child) {
-//       return Padding(
-//         padding: const EdgeInsets.all(12),
-//         child: Center(child: child),
-//       );
-//     }).toList();
+  TableRow buildRow(int index, Value value) {
+    var connector = widget.connectors[index];
+    String valueText =
+        connector.formatter?.formatObject(value) ?? value.toString();
+    String description = connector.label ?? "Value";
+    String unitStr = (connector.unit != null) ? "[${connector.unit}]" : "";
+    String label = "$description $unitStr";
 
-//     return TableRow(children: children);
-//   }
-// }
+    List<Widget> children = [Text(label), Text(valueText)].map((child) {
+      return Padding(
+        padding: const EdgeInsets.all(12),
+        child: Center(child: child),
+      );
+    }).toList();
+
+    return TableRow(children: children);
+  }
+}

@@ -1,6 +1,5 @@
 import 'package:bench_core/messages.dart';
 import 'package:bench_core/src/messages/actions.dart';
-import 'dart:convert';
 
 abstract class StringCodec<T> {
   String encode(T value);

@@ -62,7 +62,7 @@ class BioreactorDeviceConnector extends DeviceConnector<BioreactorBus> {
 
   factory BioreactorDeviceConnector.mockupMqtt(MqttService mqtt) {
     double currentTime = 0;
-    const double tEps = 1e-3;
+    // const double tEps = 1e-3;
     const double dt = 1.0;
 
     var bioreactor = BioreactorModel();

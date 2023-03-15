@@ -157,7 +157,11 @@ class StirrerControlConnector extends ControlConnector<StirrerBus> {
             onCurrentValue: onSpeedCurrentValue,
             onTargetReadValue: onSpeedTargetValue),
         onTime = SetValueControlConnector<double>(onOnTimeValue),
-        offTime = SetValueControlConnector<double>(onOffTimeValue);
+        offTime = SetValueControlConnector<double>(onOffTimeValue) {
+    speed.currentConnector.configure(
+        label: "Stirrer speed", unit: "rpm", formatter: FloatFormatter());
+    dutyCycle.configure(label: "Motor load", formatter: PercentFormatter());
+  }
 
   @override
   void connectForwardChannels(StirrerBus bus) {

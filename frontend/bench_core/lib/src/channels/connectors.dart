@@ -16,16 +16,11 @@ abstract class DeviceConnector<B extends ChannelBus> {
   void connectReverseChannels(B bus);
 }
 
+typedef Value = Object;
+typedef OnValueFn<V> = void Function(V value);
+
 abstract class ControlConnector<B extends ChannelBus> {
   void connectForwardChannels(B bus);
   void connectReverseChannels(B bus);
-  void bindHandler<V>(Stream<V> stream, Function(V value)? handler) {
-    stream.listen((value) {
-      if (handler != null) {
-        handler(value);
-      }
-    });
-  }
-
   void dispose();
 }

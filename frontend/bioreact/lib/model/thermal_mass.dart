@@ -1,6 +1,5 @@
 import 'package:bench_core/channels.dart';
 import 'package:bench_core/log.dart';
-import 'package:bench_simulator/bench_simulator.dart';
 
 class ThermalMassSystem with Logging {
   double temperature;
@@ -25,7 +24,7 @@ class ThermalMassSystem with Logging {
 
   // @override
   void advanceTime(double tLast, double dt) {
-    double tCurrent = tLast + dt;
+    // double tCurrent = tLast + dt;
 
     // Compute new state
     if ((temperature < targetTemperature - temperatureTolerance) && !heaterOn) {
@@ -122,7 +121,12 @@ class ThermalControlConnector extends ControlConnector<ThermalBus> {
           onCurrentValue: onTemperatureCurrentValue,
           onTargetReadValue: onTemperatureTargetValue,
         ),
-        heater = MeasurementControlConnector<bool>(onHeaterValue);
+        heater = MeasurementControlConnector<bool>(onHeaterValue) {
+    temperature.currentConnector.configure(
+        label: "Temperature", unit: "degC", formatter: FloatFormatter());
+
+    heater.configure(label: "Heater", formatter: OnOffFormatter());
+  }
 
   @override
   void connectForwardChannels(ThermalBus bus) {
