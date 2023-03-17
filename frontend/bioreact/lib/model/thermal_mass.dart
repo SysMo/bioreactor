@@ -11,9 +11,6 @@ class ThermalMassSystem with Logging {
   double ambientTemperature = 20.0;
   bool heaterOn = false;
 
-  double tCurrent = 0;
-  double tEps = 1e-6;
-
   ThermalMassSystem({
     this.heatCapacity = 1000.0,
     this.heaterPower = 1000.0,

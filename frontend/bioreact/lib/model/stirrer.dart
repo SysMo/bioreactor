@@ -10,8 +10,6 @@ class StirrerModel with Logging {
   double kOmega = 3e3;
   double kProp = 1e-4;
 
-  double tCurrent = 0.0;
-
   double tOn = 1000.0;
   double tOff = 0.0;
   double tLastSwitch = 0.0;
