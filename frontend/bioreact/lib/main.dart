@@ -36,13 +36,13 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  late BioreactorDeviceConnector deviceConnector;
+  // late BioreactorDeviceConnector deviceConnector;
   late BioreactorControlConnector controlConnector =
       BioreactorControlConnector.empty();
   @override
   void initState() {
     var mqtt = Services.instance.mqtt!;
-    deviceConnector = BioreactorDeviceConnector.mockupMqtt(mqtt);
+    // deviceConnector = BioreactorDeviceConnector.mockupMqtt(mqtt);
 
     super.initState();
     var clientBus = BioreactorBus();

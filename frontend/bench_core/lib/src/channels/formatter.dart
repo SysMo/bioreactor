@@ -29,7 +29,7 @@ class PercentFormatter extends Formatter<double> {
 
   @override
   String format(double value) {
-    var exp = log(value) / log(10.0);
+    var exp = value.abs() < 1e-10 ? 0 : log(value.abs()) / log(10.0);
     var roundingMult = pow(10, (significantDigits - exp.floor() - 1));
     var valueRounded = (value * roundingMult).round() / roundingMult * 100.0;
     return "$valueRounded%";

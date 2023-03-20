@@ -26,9 +26,9 @@ class _FloatSetValueWidgetState extends State<FloatSetValueWidget> {
   void initState() {
     super.initState();
 
-    widget.connector.setOnReadValue((v) => setState(() {
-          print("Initial value read: $v");
-          value = v;
+    widget.connector.setOnReadValue((m) => setState(() {
+          print("Initial value read: $m");
+          value = m.value;
         }));
     widget.connector.readValue();
   }

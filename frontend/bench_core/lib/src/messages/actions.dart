@@ -30,25 +30,6 @@ class _SetValueActionCodec<V> extends StringCodec<SetValueAction<V>> {
   }
 }
 
-// @freezed
-// class FloatValueAction with _$FloatValueAction {
-//   const factory FloatValueAction.setValue(double value) = SetValue;
-//   const factory FloatValueAction.readValue() = ReadValue;
-
-//   factory FloatValueAction.fromJson(Map<String, Object?> json) =>
-//       _$FloatValueActionFromJson(json);
-
-//   static Codec<FloatValueAction> codec = _FloatValueActionCodec();
-// }
-
-// class _FloatValueActionCodec extends Codec<FloatValueAction> {
-//   @override
-//   FloatValueAction decode(String s) => FloatValueAction.fromJson(jsonDecode(s));
-
-//   @override
-//   String encode(FloatValueAction value) => jsonEncode(value.toJson());
-// }
-
 @freezed
 class SetPointAction with _$SetPointAction {
   const factory SetPointAction.setTarget(double value) = SetTarget;

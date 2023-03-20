@@ -28,12 +28,12 @@ class _SetPointWidgetState extends State<SetPointWidget> {
   void initState() {
     super.initState();
 
-    widget.connector.currentConnector.setOnValue((v) => setState(() {
-          measuredValue = v;
+    widget.connector.currentConnector.setOnValue((m) => setState(() {
+          measuredValue = m.value;
         }));
 
-    widget.connector.targetConnector.setOnReadValue((v) => setState(() {
-          setpointValue = v;
+    widget.connector.targetConnector.setOnReadValue((m) => setState(() {
+          setpointValue = m.value;
         }));
 
     widget.connector.targetConnector.readValue();

@@ -15,7 +15,7 @@ mixin HasValues {
       values.add("N/A");
       connector.setOnValue((v) {
         stateUpdateFn(() {
-          values[index] = v;
+          values[index] = v.value;
         });
       });
     }

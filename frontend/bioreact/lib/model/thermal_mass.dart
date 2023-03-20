@@ -1,5 +1,6 @@
 import 'package:bench_core/channels.dart';
 import 'package:bench_core/log.dart';
+import 'package:bench_core/messages.dart';
 
 class ThermalMassSystem with Logging {
   double temperature;
@@ -111,9 +112,9 @@ class ThermalControlConnector extends ControlConnector<ThermalBus> {
   SetPointControlConnector temperature;
   MeasurementControlConnector<bool> heater;
   ThermalControlConnector({
-    Function(double value)? onTemperatureCurrentValue,
-    Function(double value)? onTemperatureTargetValue,
-    Function(bool value)? onHeaterValue,
+    Function(Measurement<double> value)? onTemperatureCurrentValue,
+    Function(Measurement<double> value)? onTemperatureTargetValue,
+    Function(Measurement<bool> value)? onHeaterValue,
   })  : temperature = SetPointControlConnector(
           onCurrentValue: onTemperatureCurrentValue,
           onTargetReadValue: onTemperatureTargetValue,

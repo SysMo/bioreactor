@@ -1,17 +1,18 @@
 import 'package:bench_core/src/channels/stream_channel.dart';
 import 'package:bench_core/src/messages/actions.dart';
+import 'package:bench_core/src/messages/measurements.dart';
 import 'dart:async';
 import 'connectors.dart';
 import 'channel_bus.dart';
 
 class SetValueChannel<V> extends ChannelBus {
   String id;
-  ForwardStreamChannel<V> reader;
+  ForwardStreamChannel<Measurement<V>> reader;
   ReverseStreamChannel<SetValueAction<V>> action;
   SetValueChannel._(
       {required this.id, required this.reader, required this.action});
   factory SetValueChannel({required String id}) {
-    var readerChannel = ForwardStreamChannel<V>(id: "reader");
+    var readerChannel = ForwardStreamChannel<Measurement<V>>(id: "reader");
     var actionChannel = ReverseStreamChannel<SetValueAction<V>>(id: "action");
     return SetValueChannel._(
         id: id, reader: readerChannel, action: actionChannel);
@@ -47,7 +48,9 @@ class SetValueDeviceConnector<V> extends DeviceConnector<SetValueChannel<V>> {
 
   @override
   void connectForwardChannels(SetValueChannel<V> bus) {
-    bus.reader.connect(readerController.stream.asBroadcastStream());
+    bus.reader.connect(readerController.stream
+        .map((v) => Measurement(timestamp: "now", value: v))
+        .asBroadcastStream());
   }
 
   @override
@@ -65,16 +68,16 @@ class SetValueDeviceConnector<V> extends DeviceConnector<SetValueChannel<V>> {
 
 class SetValueControlConnector<V> extends ControlConnector<SetValueChannel<V>> {
   StreamController<SetValueAction<V>> actionController = StreamController();
-  void Function(V value)? onReadValue;
+  void Function(Measurement<V> value)? onReadValue;
   late StreamSubscription<V> onReadValueSubscription;
 
-  SetValueControlConnector(void Function(V value)? onReadValue) {
+  SetValueControlConnector(void Function(Measurement<V> value)? onReadValue) {
     if (onReadValue != null) {
       this.onReadValue = onReadValue;
     }
   }
 
-  void setOnReadValue(void Function(V v) onReadValue) {
+  void setOnReadValue(void Function(Measurement<V> v) onReadValue) {
     if (this.onReadValue == null) {
       this.onReadValue = onReadValue;
     } else {

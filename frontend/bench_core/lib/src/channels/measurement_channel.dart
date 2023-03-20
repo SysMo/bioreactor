@@ -1,12 +1,13 @@
 import 'package:bench_core/src/channels/stream_channel.dart';
+import 'package:bench_core/src/messages/measurements.dart';
 import 'dart:async';
 import 'connectors.dart';
 import 'channel_bus.dart';
 import 'formatter.dart';
 
 class MeasurementChannel<V> implements ChannelBus {
-  ForwardStreamChannel<V> streamChannel;
-  MeasurementChannel({required String id, Stream<V>? valueStream})
+  ForwardStreamChannel<Measurement<V>> streamChannel;
+  MeasurementChannel({required String id, Stream<Measurement<V>>? valueStream})
       : streamChannel = ForwardStreamChannel(id: id, valueStream: valueStream);
 
   @override
@@ -32,7 +33,8 @@ class MeasurementDeviceConnector<V>
 
   @override
   void connectForwardChannels(MeasurementChannel<V> bus) {
-    bus.streamChannel.connect(readerController.stream);
+    bus.streamChannel.connect(readerController.stream
+        .map((v) => Measurement(timestamp: "now", value: v)));
   }
 
   @override
@@ -48,19 +50,19 @@ class MeasurementDeviceConnector<V>
 
 class MeasurementControlConnector<V>
     extends ControlConnector<MeasurementChannel<V>> {
-  List<OnValueFn<V>> onValue = [];
+  List<OnMeasurementValueFn<V>> onValue = [];
   Formatter<V>? formatter;
   String? label;
   String? unit;
-  late StreamSubscription<V> onValueSubscription;
+  late StreamSubscription<Measurement<V>> onValueSubscription;
 
-  MeasurementControlConnector(OnValueFn<V>? onValue) {
+  MeasurementControlConnector(OnMeasurementValueFn<V>? onValue) {
     if (onValue != null) {
       this.onValue.add(onValue);
     }
   }
 
-  void setOnValue(OnValueFn<V> onValue) {
+  void setOnValue(OnMeasurementValueFn<V> onValue) {
     this.onValue.add(onValue);
   }
 

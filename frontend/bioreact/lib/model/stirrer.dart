@@ -1,5 +1,6 @@
 import 'package:bench_core/channels.dart';
 import 'package:bench_core/log.dart';
+import 'package:bench_core/messages.dart';
 
 class StirrerModel with Logging {
   double omega = 0.0;
@@ -145,11 +146,11 @@ class StirrerControlConnector extends ControlConnector<StirrerBus> {
   SetValueControlConnector<double> offTime;
 
   StirrerControlConnector({
-    Function(double value)? onDutyCycleValue,
-    Function(double value)? onSpeedCurrentValue,
-    Function(double value)? onSpeedTargetValue,
-    Function(double value)? onOnTimeValue,
-    Function(double value)? onOffTimeValue,
+    Function(Measurement<double> m)? onDutyCycleValue,
+    Function(Measurement<double> m)? onSpeedCurrentValue,
+    Function(Measurement<double> m)? onSpeedTargetValue,
+    Function(Measurement<double> m)? onOnTimeValue,
+    Function(Measurement<double> m)? onOffTimeValue,
   })  : dutyCycle = MeasurementControlConnector<double>(onDutyCycleValue),
         speed = SetPointControlConnector(
             onCurrentValue: onSpeedCurrentValue,

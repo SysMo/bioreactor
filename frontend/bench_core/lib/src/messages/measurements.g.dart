@@ -6,16 +6,20 @@ part of 'measurements.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-// ignore: non_constant_identifier_names
-_$_MeasurementValue _$$_MeasurementValueFromJson(Map<String, dynamic> json) =>
-    _$_MeasurementValue(
-      sensor: json['sensor'] as String,
-      value: Value.fromJson(json['value'] as Map<String, dynamic>),
+_$_Measurement<V> _$$_MeasurementFromJson<V>(
+  Map<String, dynamic> json,
+  V Function(Object? json) fromJsonV,
+) =>
+    _$_Measurement<V>(
+      timestamp: json['timestamp'] as String,
+      value: fromJsonV(json['value']),
     );
 
-// ignore: non_constant_identifier_names
-Map<String, dynamic> _$$_MeasurementValueToJson(_$_MeasurementValue instance) =>
+Map<String, dynamic> _$$_MeasurementToJson<V>(
+  _$_Measurement<V> instance,
+  Object? Function(V value) toJsonV,
+) =>
     <String, dynamic>{
-      'sensor': instance.sensor,
-      'value': instance.value,
+      'timestamp': instance.timestamp,
+      'value': toJsonV(instance.value),
     };

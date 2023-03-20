@@ -1,5 +1,6 @@
 import 'package:bench_core/messages.dart';
 import 'package:bench_core/src/messages/actions.dart';
+import 'package:bench_core/src/messages/measurements.dart';
 
 abstract class StringCodec<T> {
   String encode(T value);
@@ -38,6 +39,8 @@ class ObjectCodecRegistry {
   static ObjectCodec<T> getCodec<T>() {
     if (T == double) {
       return FloatObjectCodec() as ObjectCodec<T>;
+    } else if (T == bool) {
+      return BoolObjectCodec() as ObjectCodec<T>;
     } else {
       throw MissingCodec(T.runtimeType.toString());
     }
@@ -56,6 +59,20 @@ class FloatObjectCodec extends ObjectCodec<double> {
 
   @override
   double get defaultValue => double.nan;
+}
+
+class BoolObjectCodec extends ObjectCodec<bool> {
+  @override
+  bool decodeImpl(Object s) {
+    if (s is bool) {
+      return s;
+    } else {
+      throw DecodingFailure(s.runtimeType, double);
+    }
+  }
+
+  @override
+  bool get defaultValue => false;
 }
 
 class FloatStringCodec extends StringCodec<double> {
@@ -94,8 +111,14 @@ class StringCodecRegistry {
       return BoolStringCodec() as StringCodec<T>;
     } else if (T == SetValueAction<double>) {
       return SetValueAction.codec<double>() as StringCodec<T>;
+    } else if (T == SetValueAction<bool>) {
+      return SetValueAction.codec<bool>() as StringCodec<T>;
     } else if (T == SetPointAction) {
       return SetPointAction.codec as StringCodec<T>;
+    } else if (T == Measurement<double>) {
+      return Measurement.codec<double>() as StringCodec<T>;
+    } else if (T == Measurement<bool>) {
+      return Measurement.codec<bool>() as StringCodec<T>;
     } else {
       throw MissingCodec(T.runtimeType.toString());
     }

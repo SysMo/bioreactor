@@ -14,36 +14,36 @@ T _$identity<T>(T value) => value;
 final _privateConstructorUsedError = UnsupportedError(
     'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
 
-MeasurementValue _$MeasurementValueFromJson(Map<String, dynamic> json) {
-  return _MeasurementValue.fromJson(json);
+Measurement<V> _$MeasurementFromJson<V>(
+    Map<String, dynamic> json, V Function(Object?) fromJsonV) {
+  return _Measurement<V>.fromJson(json, fromJsonV);
 }
 
 /// @nodoc
-mixin _$MeasurementValue {
-  String get sensor => throw _privateConstructorUsedError;
-  Value get value => throw _privateConstructorUsedError;
+mixin _$Measurement<V> {
+  String get timestamp => throw _privateConstructorUsedError;
+  V get value => throw _privateConstructorUsedError;
 
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  Map<String, dynamic> toJson(Object? Function(V) toJsonV) =>
+      throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
-  $MeasurementValueCopyWith<MeasurementValue> get copyWith =>
+  $MeasurementCopyWith<V, Measurement<V>> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class $MeasurementValueCopyWith<$Res> {
-  factory $MeasurementValueCopyWith(
-          MeasurementValue value, $Res Function(MeasurementValue) then) =
-      _$MeasurementValueCopyWithImpl<$Res, MeasurementValue>;
+abstract class $MeasurementCopyWith<V, $Res> {
+  factory $MeasurementCopyWith(
+          Measurement<V> value, $Res Function(Measurement<V>) then) =
+      _$MeasurementCopyWithImpl<V, $Res, Measurement<V>>;
   @useResult
-  $Res call({String sensor, Value value});
-
-  $ValueCopyWith<$Res> get value;
+  $Res call({String timestamp, V value});
 }
 
 /// @nodoc
-class _$MeasurementValueCopyWithImpl<$Res, $Val extends MeasurementValue>
-    implements $MeasurementValueCopyWith<$Res> {
-  _$MeasurementValueCopyWithImpl(this._value, this._then);
+class _$MeasurementCopyWithImpl<V, $Res, $Val extends Measurement<V>>
+    implements $MeasurementCopyWith<V, $Res> {
+  _$MeasurementCopyWithImpl(this._value, this._then);
 
   // ignore: unused_field
   final $Val _value;
@@ -53,130 +53,121 @@ class _$MeasurementValueCopyWithImpl<$Res, $Val extends MeasurementValue>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? sensor = null,
-    Object? value = null,
+    Object? timestamp = null,
+    Object? value = freezed,
   }) {
     return _then(_value.copyWith(
-      sensor: null == sensor
-          ? _value.sensor
-          : sensor // ignore: cast_nullable_to_non_nullable
+      timestamp: null == timestamp
+          ? _value.timestamp
+          : timestamp // ignore: cast_nullable_to_non_nullable
               as String,
-      value: null == value
+      value: freezed == value
           ? _value.value
           : value // ignore: cast_nullable_to_non_nullable
-              as Value,
+              as V,
     ) as $Val);
   }
-
-  @override
-  @pragma('vm:prefer-inline')
-  $ValueCopyWith<$Res> get value {
-    return $ValueCopyWith<$Res>(_value.value, (value) {
-      return _then(_value.copyWith(value: value) as $Val);
-    });
-  }
 }
 
 /// @nodoc
-abstract class _$$_MeasurementValueCopyWith<$Res>
-    implements $MeasurementValueCopyWith<$Res> {
-  factory _$$_MeasurementValueCopyWith(
-          _$_MeasurementValue value, $Res Function(_$_MeasurementValue) then) =
-      __$$_MeasurementValueCopyWithImpl<$Res>;
+abstract class _$$_MeasurementCopyWith<V, $Res>
+    implements $MeasurementCopyWith<V, $Res> {
+  factory _$$_MeasurementCopyWith(
+          _$_Measurement<V> value, $Res Function(_$_Measurement<V>) then) =
+      __$$_MeasurementCopyWithImpl<V, $Res>;
   @override
   @useResult
-  $Res call({String sensor, Value value});
-
-  @override
-  $ValueCopyWith<$Res> get value;
+  $Res call({String timestamp, V value});
 }
 
 /// @nodoc
-class __$$_MeasurementValueCopyWithImpl<$Res>
-    extends _$MeasurementValueCopyWithImpl<$Res, _$_MeasurementValue>
-    implements _$$_MeasurementValueCopyWith<$Res> {
-  __$$_MeasurementValueCopyWithImpl(
-      _$_MeasurementValue _value, $Res Function(_$_MeasurementValue) _then)
+class __$$_MeasurementCopyWithImpl<V, $Res>
+    extends _$MeasurementCopyWithImpl<V, $Res, _$_Measurement<V>>
+    implements _$$_MeasurementCopyWith<V, $Res> {
+  __$$_MeasurementCopyWithImpl(
+      _$_Measurement<V> _value, $Res Function(_$_Measurement<V>) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? sensor = null,
-    Object? value = null,
+    Object? timestamp = null,
+    Object? value = freezed,
   }) {
-    return _then(_$_MeasurementValue(
-      sensor: null == sensor
-          ? _value.sensor
-          : sensor // ignore: cast_nullable_to_non_nullable
+    return _then(_$_Measurement<V>(
+      timestamp: null == timestamp
+          ? _value.timestamp
+          : timestamp // ignore: cast_nullable_to_non_nullable
               as String,
-      value: null == value
+      value: freezed == value
           ? _value.value
           : value // ignore: cast_nullable_to_non_nullable
-              as Value,
+              as V,
     ));
   }
 }
 
 /// @nodoc
-@JsonSerializable()
-class _$_MeasurementValue implements _MeasurementValue {
-  const _$_MeasurementValue({required this.sensor, required this.value});
+@JsonSerializable(genericArgumentFactories: true)
+class _$_Measurement<V> implements _Measurement<V> {
+  const _$_Measurement({required this.timestamp, required this.value});
 
-  factory _$_MeasurementValue.fromJson(Map<String, dynamic> json) =>
-      _$$_MeasurementValueFromJson(json);
+  factory _$_Measurement.fromJson(
+          Map<String, dynamic> json, V Function(Object?) fromJsonV) =>
+      _$$_MeasurementFromJson(json, fromJsonV);
 
   @override
-  final String sensor;
+  final String timestamp;
   @override
-  final Value value;
+  final V value;
 
   @override
   String toString() {
-    return 'MeasurementValue(sensor: $sensor, value: $value)';
+    return 'Measurement<$V>(timestamp: $timestamp, value: $value)';
   }
 
   @override
   bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$_MeasurementValue &&
-            (identical(other.sensor, sensor) || other.sensor == sensor) &&
-            (identical(other.value, value) || other.value == value));
+            other is _$_Measurement<V> &&
+            (identical(other.timestamp, timestamp) ||
+                other.timestamp == timestamp) &&
+            const DeepCollectionEquality().equals(other.value, value));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, sensor, value);
+  int get hashCode => Object.hash(
+      runtimeType, timestamp, const DeepCollectionEquality().hash(value));
 
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$_MeasurementValueCopyWith<_$_MeasurementValue> get copyWith =>
-      __$$_MeasurementValueCopyWithImpl<_$_MeasurementValue>(this, _$identity);
+  _$$_MeasurementCopyWith<V, _$_Measurement<V>> get copyWith =>
+      __$$_MeasurementCopyWithImpl<V, _$_Measurement<V>>(this, _$identity);
 
   @override
-  Map<String, dynamic> toJson() {
-    return _$$_MeasurementValueToJson(
-      this,
-    );
+  Map<String, dynamic> toJson(Object? Function(V) toJsonV) {
+    return _$$_MeasurementToJson<V>(this, toJsonV);
   }
 }
 
-abstract class _MeasurementValue implements MeasurementValue {
-  const factory _MeasurementValue(
-      {required final String sensor,
-      required final Value value}) = _$_MeasurementValue;
+abstract class _Measurement<V> implements Measurement<V> {
+  const factory _Measurement(
+      {required final String timestamp,
+      required final V value}) = _$_Measurement<V>;
 
-  factory _MeasurementValue.fromJson(Map<String, dynamic> json) =
-      _$_MeasurementValue.fromJson;
+  factory _Measurement.fromJson(
+          Map<String, dynamic> json, V Function(Object?) fromJsonV) =
+      _$_Measurement<V>.fromJson;
 
   @override
-  String get sensor;
+  String get timestamp;
   @override
-  Value get value;
+  V get value;
   @override
   @JsonKey(ignore: true)
-  _$$_MeasurementValueCopyWith<_$_MeasurementValue> get copyWith =>
+  _$$_MeasurementCopyWith<V, _$_Measurement<V>> get copyWith =>
       throw _privateConstructorUsedError;
 }
