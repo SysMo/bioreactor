@@ -3,5 +3,8 @@ terminal/clear:
 
 build/pre: terminal/clear
 
-bioreactor_model/run: build/pre
-	cargo run --example 01_bioreactor_model
+01_messaging/run: build/pre
+	cargo run --example 01_messaging
+
+02_bioreactor_model/run: build/pre
+	cargo run --example 02_bioreactor_model

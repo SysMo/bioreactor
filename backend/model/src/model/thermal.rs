@@ -1,15 +1,17 @@
-use flowmbed_peripherals::channels::{MeasurementChannel, SetPointChannel, DeviceBusConnector, ChannelBus};
-
+use flowmbed_peripherals::channels::{MeasurementChannel, SetPointChannel, DeviceBusConnector, IOConnector};
+use flowmbed_peripherals::util::QualifiedPath;
+use flowmbed_peripherals::mqtt::MqttService;
+use flowmbed_peripherals::set_value_handler;
 
 pub struct ThermalMassModel {
-  temperature: f32,
-  target_temperature: f32,
-  temperature_tolerance: f32,
-  heat_capacity: f32,
-  heater_power: f32,
-  heat_loss_conv: f32,
-  ambient_temperature: f32,
-  heater_on: bool,
+  pub temperature: f32,
+  pub target_temperature: f32,
+  pub temperature_tolerance: f32,
+  pub heat_capacity: f32,
+  pub heater_power: f32,
+  pub heat_loss_conv: f32,
+  pub ambient_temperature: f32,
+  pub heater_on: bool,
 }
 
 impl ThermalMassModel {
@@ -45,42 +47,34 @@ impl ThermalMassModel {
 
 pub struct ThermalBus {
   id: String,
-  temperature: MeasurementChannel<f32>,
-  // temperature: SetPointChannel,
-  // heater: MeasurementChannel<bool>,  
+  pub temperature: SetPointChannel,
+  pub heater: MeasurementChannel<bool>,  
 }
 
 impl ThermalBus {
   pub fn new(id: &str) -> Self {
     ThermalBus {
       id: id.to_owned(),
-      temperature: MeasurementChannel::new("temperature"),
-      // temperature: SetPointChannel::new("temperature"),
-      // heater: MeasurementChannel::new("heater")
+      temperature: SetPointChannel::new("temperature"),
+      heater: MeasurementChannel::new("heater")
     }
   }
 }
 
-impl ChannelBus for ThermalBus {
-
-}
-
 impl DeviceBusConnector<ThermalMassModel> for ThermalBus {
-  fn send(&self, device: &ThermalMassModel) {
-    self.temperature.stream_channel.valueStream.send(device.temperature).unwrap();
+  fn sample(&self, device: &ThermalMassModel) {
+    self.temperature.current.sample(device.temperature);
+    self.heater.sample(device.heater_on);
   }
-  fn receive(&self, device: &ThermalMassModel) {
-    
+  fn handle_actions(&self, device: &mut ThermalMassModel) {
+    set_value_handler!(self, temperature.target, device, target_temperature);
   }
 }
 
 
-// impl DeviceBusConnector<ThermalMassModel> for ThermalBus {
-//   fn connect_forward_channels(&self, device: D) {
-
-//   }
-
-//   fn connect_reverse_channels(&self, device: D) {
-
-//   }
-// }
+impl IOConnector for ThermalBus {  
+  fn connect_io(&mut self, comm: &mut dyn MqttService, qpath: &QualifiedPath) {
+      self.temperature.connect_io(comm, &qpath.append(&self.id));
+      self.heater.connect_io(comm, &qpath.append(&self.id));
+  }
+}

@@ -1,6 +1,8 @@
 use super::thermal::{ThermalMassModel, ThermalBus};
-use super::stirrer::{StirrerModel};
-use flowmbed_peripherals::channels::{DeviceBusConnector, ChannelBus};
+use super::stirrer::{StirrerModel, StirrerBus};
+use flowmbed_peripherals::channels::{DeviceBusConnector, IOConnector};
+use flowmbed_peripherals::util::QualifiedPath;
+use flowmbed_peripherals::mqtt::MqttService;
 
 pub struct BioreactorModel {
   thermal: ThermalMassModel,
@@ -23,42 +25,36 @@ impl BioreactorModel {
 
 pub struct BioreactorBus {
   id: String,
-  thermal: ThermalBus  
+  thermal: ThermalBus,
+  stirrer: StirrerBus,
 }
 
 impl BioreactorBus {
   pub fn new(id: &str) -> Self {
     BioreactorBus { 
       id: id.to_owned(),
-      thermal: ThermalBus::new("thermal")
+      thermal: ThermalBus::new("thermal"),
+      stirrer: StirrerBus::new("stirrer"),
     }
   }
 }
 
-impl ChannelBus for BioreactorBus {
-
+impl DeviceBusConnector<BioreactorModel> for BioreactorBus {
+  fn sample(&self, device: &BioreactorModel) {
+    self.thermal.sample(&device.thermal);
+    self.stirrer.sample(&device.stirrer);
+  }
+  fn handle_actions(&self, device: &mut BioreactorModel) {
+    self.thermal.handle_actions(&mut device.thermal);
+    self.stirrer.handle_actions(&mut device.stirrer);
+    
+  }
 }
 
+impl IOConnector for BioreactorBus {  
+  fn connect_io(&mut self, comm: &mut dyn MqttService, qpath: &QualifiedPath) {
+      self.thermal.connect_io(comm, &qpath.append(&self.id));
+      self.stirrer.connect_io(comm, &qpath.append(&self.id));
+  }
+}
 
-
-// pub struct BioreactorDeviceConnector {
-//   thermal: ThermalDeviceConnector
-// }
-
-// impl BioreactorDeviceConnector {
-//   pub fn new() -> Self {
-//     BioreactorDeviceConnector { 
-//       thermal: ThermalDeviceConnector::new()
-//     }
-//   }
-// }
-
-// impl DeviceBusConnector<BioreactorBus> for BioreactorModel {
-//   fn connect_forward_channels(&self, bus: BioreactorBus) {
-    
-//   }
-
-//   fn connect_reverse_channels(&self, bus: BioreactorBus) {
-
-//   }
-// }
