@@ -12,7 +12,7 @@ pub struct BioreactorModel {
 impl BioreactorModel {
   pub fn new() -> Self {
     BioreactorModel { 
-      thermal: ThermalMassModel::new(25.0),
+      thermal: ThermalMassModel::new(30.0),
       stirrer: StirrerModel::new() 
     }
   }
