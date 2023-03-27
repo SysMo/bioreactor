@@ -29,8 +29,8 @@ impl StirrerModel {
       k_omega: 3e3, 
       k_prop: 1e-4, 
       
-      on_time: 30.0, 
-      off_time: 10.0, 
+      on_time: 1.0, 
+      off_time: 2.0, 
       t_last_switch: 0.0, 
       is_on: true 
     }
@@ -39,10 +39,10 @@ impl StirrerModel {
   pub fn step(&mut self, t_last: f32, dt: f32) {
     let t_current = t_last + dt;
 
-    if self.is_on && (t_current - self.t_last_switch > self.on_time) && (self.off_time > 0.0) {
+    if self.is_on && (t_current - self.t_last_switch > self.on_time * 60.0) && (self.off_time > 0.0) {
       self.is_on = false;
       self.t_last_switch = t_current;
-    } else if !self.is_on && (t_current - self.t_last_switch > self.off_time) {
+    } else if !self.is_on && (t_current - self.t_last_switch > self.off_time * 60.0) {
       self.is_on = true;
       self.t_last_switch = t_current;
     }

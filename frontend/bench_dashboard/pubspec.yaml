@@ -12,11 +12,15 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  syncfusion_flutter_gauges: ^20.4.51
-  sprintf: "^7.0.0"
+  syncfusion_flutter_gauges: ^20.4.54
+  
+  syncfusion_flutter_charts: ^20.4.54
+  
+  # sprintf: "^7.0.0"
   bench_core:
     path: ../bench_core
   collection: ^1.17.0
+  graphic: ^1.0.1
 
 dev_dependencies:
   flutter_test:

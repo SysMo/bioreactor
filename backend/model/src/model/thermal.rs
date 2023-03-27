@@ -21,8 +21,8 @@ impl ThermalMassModel {
       target_temperature: 35.0,
       temperature_tolerance: 1.0, 
       heat_capacity: 3000.0, 
-      heater_power: 1000.0, 
-      heat_loss_conv: 10.0, 
+      heater_power: 100.0, 
+      heat_loss_conv: 1.0, 
       ambient_temperature: 20.0, 
       heater_on: false 
     }

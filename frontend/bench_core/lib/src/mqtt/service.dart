@@ -6,7 +6,7 @@ import 'package:mqtt_client/mqtt_server_client.dart';
 import '../channels/channel_bus.dart';
 
 class MqttService with Logging {
-  final String url;
+  // final String url;
   final String username;
   final String password;
   final String clientId;
@@ -18,7 +18,30 @@ class MqttService with Logging {
   StreamSubscription? mainSubscription;
   Map<String, StreamController<String>> topicControllers = {};
 
-  Future<void> connect() async {
+  MqttService._({
+    // required this.url,
+    required this.username,
+    required this.password,
+    required this.clientId,
+    required this.client,
+  });
+
+  factory MqttService.create(
+      {required String url,
+      required String username,
+      required String password,
+      String clientId = ""}) {
+    var client = MqttServerClient.withPort(url, clientId, 8883);
+    return MqttService._(
+      // url: url,
+      username: username,
+      password: password,
+      clientId: clientId,
+      client: client,
+    );
+  }
+
+  Future<void> start() async {
     // client.port = port;
     // client.logging(on: true);
     client.keepAlivePeriod = 30;
@@ -132,11 +155,4 @@ class MqttService with Logging {
       }
     });
   }
-
-  MqttService.configure(
-      {required this.url,
-      required this.username,
-      required this.password,
-      this.clientId = ""})
-      : client = MqttServerClient.withPort(url, clientId, 8883);
 }

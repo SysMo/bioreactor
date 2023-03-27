@@ -69,7 +69,7 @@ class SetValueDeviceConnector<V> extends DeviceConnector<SetValueChannel<V>> {
 class SetValueControlConnector<V> extends ControlConnector<SetValueChannel<V>> {
   StreamController<SetValueAction<V>> actionController = StreamController();
   void Function(Measurement<V> value)? onReadValue;
-  late StreamSubscription<V> onReadValueSubscription;
+  late StreamSubscription<Measurement<V>> onReadValueSubscription;
 
   SetValueControlConnector(void Function(Measurement<V> value)? onReadValue) {
     if (onReadValue != null) {
@@ -99,7 +99,7 @@ class SetValueControlConnector<V> extends ControlConnector<SetValueChannel<V>> {
 
   @override
   void connectForwardChannels(SetValueChannel<V> bus) {
-    bus.reader.valueStream.listen((value) {
+    onReadValueSubscription = bus.reader.valueStream.listen((value) {
       if (onReadValue != null) onReadValue!(value);
     });
   }

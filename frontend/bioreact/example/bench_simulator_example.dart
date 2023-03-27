@@ -69,14 +69,14 @@ void bioreactorControllerSide(MqttService mqtt) {
 }
 
 void main() async {
-  print("Start testing");
-  var mqtt = MqttService.configure(
+  // print("Start testing");
+  var mqtt = MqttService.create(
       url: "c0a7164f.ala.us-east-1.emqxsl.com",
       username: "sysmo",
       password: "sysmopass",
       clientId: "bio_app");
-  await mqtt.connect();
+  await mqtt.start();
   bioreactorDeviceSide(mqtt);
   bioreactorControllerSide(mqtt);
-  print("Done testing");
+  // print("Done testing");
 }

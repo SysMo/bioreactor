@@ -77,7 +77,6 @@ class BioreactorDeviceConnector extends DeviceConnector<BioreactorBus> {
       (timer) {
         bioreactor.advanceTime(currentTime, dt);
         currentTime += dt;
-        print("t = $currentTime");
         connector.sample();
       },
     );
