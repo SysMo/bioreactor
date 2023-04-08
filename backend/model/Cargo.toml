@@ -6,8 +6,12 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-flowmbed_peripherals = {features = ["desktop"], path = "../../../../SysMo/flowmbed/peripherals/"}
+flowmbed_peripherals = {path = "../../../../SysMo/flowmbed/peripherals/"}
 log = "0.4"
 
 [dev-dependencies]
 simple_logger = "4.0"
+
+[features]
+desktop = ["flowmbed_peripherals/desktop"]
+embedded = []

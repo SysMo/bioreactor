@@ -7,4 +7,4 @@ build/pre: terminal/clear
 	cargo run --example 01_messaging
 
 02_bioreactor_model/run: build/pre
-	cargo run --example 02_bioreactor_model
+	cargo run --features desktop --example 02_bioreactor_model
