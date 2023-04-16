@@ -39,7 +39,7 @@ class _DeviceDashboardState extends State<DeviceDashboard> {
           title: "Motor speed [RPM]",
           connector: connector.stirrer.speed,
           minimum: 0,
-          maximum: 300,
+          maximum: 1500,
         ),
         FloatSetValueWidget(
           title: "Stirrer On time [min]",

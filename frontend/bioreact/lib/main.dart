@@ -43,7 +43,7 @@ class _MyHomePageState extends State<MyHomePage> {
   // late BioreactorDeviceConnector deviceConnector;
   late BioreactorControlConnector controlConnector =
       BioreactorControlConnector.empty();
-  int screenIndex = 1;
+  int screenIndex = 0;
 
   @override
   void initState() {
